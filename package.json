@@ -1,0 +1,86 @@
+{
+  "name": "@marklb/storybook-testing-angular",
+  "version": "0.0.2",
+  "description": "Testing utilities that allow you to reuse your stories in your unit tests",
+  "keywords": [
+    "storybook-addons",
+    "style",
+    "test"
+  ],
+  "license": "MIT",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marklb/storybook-testing-angular"
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=10"
+  },
+  "scripts": {
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "lint": "tsdx lint",
+    "prepare": "tsdx build",
+    "size": "size-limit",
+    "analyze": "size-limit --why",
+    "release": "yarn build && auto shipit"
+  },
+  "peerDependencies": {
+    "@angular/common": ">=6.0.0",
+    "@angular/core": ">=6.0.0",
+    "@angular/platform-browser": ">=6.0.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsdx lint"
+    }
+  },
+  "prettier": {
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
+  "author": "markberry867@gmail.com",
+  "module": "dist/storybook-testing-angular.esm.js",
+  "size-limit": [
+    {
+      "path": "dist/storybook-testing-angular.cjs.production.min.js",
+      "limit": "10 KB"
+    },
+    {
+      "path": "dist/storybook-testing-angular.esm.js",
+      "limit": "10 KB"
+    }
+  ],
+  "devDependencies": {
+    "@angular/common": "~12.2.0",
+    "@angular/core": "~12.2.0",
+    "@angular/platform-browser": "~12.2.0",
+    "@size-limit/preset-small-lib": "^4.10.1",
+    "auto": "^10.20.4",
+    "concurrently": "^6.0.0",
+    "husky": "^5.1.3",
+    "size-limit": "^4.10.1",
+    "tsdx": "^0.14.1",
+    "tslib": "^2.1.0",
+    "typescript": "^4.3.4"
+  },
+  "dependencies": {
+    "@storybook/addons": "^6.4.0-alpha.21",
+    "@storybook/angular": "^6.4.0-alpha.21",
+    "@storybook/client-api": "^6.4.0-alpha.21"
+  },
+  "resolutions": {
+    "**/typescript": "^4.3.4"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
