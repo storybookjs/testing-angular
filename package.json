@@ -1,6 +1,6 @@
 {
   "name": "@marklb/storybook-testing-angular",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Testing utilities that allow you to reuse your stories in your unit tests",
   "keywords": [
     "storybook-addons",
@@ -73,9 +73,9 @@
     "typescript": "^4.3.4"
   },
   "dependencies": {
-    "@storybook/addons": "^6.4.0-alpha.21",
-    "@storybook/angular": "^6.4.0-alpha.21",
-    "@storybook/client-api": "^6.4.0-alpha.21"
+    "@storybook/addons": "^6.3.8",
+    "@storybook/angular": "^6.3.8",
+    "@storybook/client-api": "^6.3.8"
   },
   "resolutions": {
     "**/typescript": "^4.3.4"
