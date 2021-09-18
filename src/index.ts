@@ -86,10 +86,17 @@ export function composeStory<GenericArgs>(
         'composeStory does not support legacy style stories (with passArgsFirst = false).'
       );
     }
-    return story(
+
+    const returnType = story(
       context.args as GenericArgs,
-      context
+      context,
     ) as StoryFnAngularReturnType;
+
+    if (!returnType.component && meta?.component) {
+      returnType.component = meta?.component;
+    }
+
+    return returnType;
   }
 
   const combinedDecorators = [
