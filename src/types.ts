@@ -6,7 +6,7 @@ import type { Story } from '@storybook/angular';
  * Object representing the preview.ts module
  *
  * Used in storybook testing utilities.
- * @see [Unit testing with Storybook](https://storybook.js.org/docs/react/workflows/unit-testing)
+ * @see [Unit testing with Storybook](https://storybook.js.org/docs/angular/workflows/unit-testing)
  */
 export type GlobalConfig = {
   decorators?: BaseDecorators<StoryFnAngularReturnType>;

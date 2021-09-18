@@ -36,11 +36,7 @@ describe('button TestBed', () => {
 describe('button testing-library', () => {
   it('renders primary button', async () => {
     const { component, ngModule } = createMountableStoryComponent((Primary as any)());
-    await render(component, {
-      imports: [ ngModule ]
-    });
-    console.log(document.body.innerHTML)
-    const buttonElement = screen.getByText(Primary.args?.label!);
-    expect(buttonElement).not.toBeNull();
+    await render(component, { imports: [ ngModule ] });
+    expect(screen.getByText(Primary.args?.label!)).not.toBeNull();
   })
 })

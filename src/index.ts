@@ -23,9 +23,9 @@ let globalStorybookConfig = {};
  *
  * Example:
  *```jsx
- * // setup.js (for jest)
- * import { setGlobalConfig } from '@storybook/testing-react';
- * import * as globalStorybookConfig from './.storybook/preview';
+ * // test.ts (for karma)
+ * import { setGlobalConfig } from '@marklb/storybook-testing-angular';
+ * import * as globalStorybookConfig from '../.storybook/preview';
  *
  * setGlobalConfig(globalStorybookConfig);
  *```
@@ -45,17 +45,20 @@ export function setGlobalConfig(config: GlobalConfig) {
  * It's very useful for reusing a story in scenarios outside of Storybook like unit testing.
  *
  * Example:
- *```jsx
- * import { render } from '@testing-library/react';
- * import { composeStory } from '@storybook/testing-react';
+ *```ts
+ * import { render, screen } from '@testing-library/angular';
+ * import { composeStory } from '@marklb/storybook-testing-angular';
  * import Meta, { Primary as PrimaryStory } from './Button.stories';
  *
  * const Primary = composeStory(PrimaryStory, Meta);
  *
- * test('renders primary button with Hello World', () => {
- *   const { getByText } = render(<Primary>Hello world</Primary>);
- *   expect(getByText(/Hello world/i)).not.toBeNull();
- * });
+ * describe('button', () => {
+ *   test('renders primary button with Hello World', () => {
+ *     const { component, ngModule } = createMountableStoryComponent((Primary as any)({ label: 'Hello world' }));
+ *     await render(component, { imports: [ ngModule ] });
+ *     expect(screen.getByText(/Hello world/i)).not.toBeNull();
+ *   });
+ * })
  *```
  *
  * @param story
@@ -69,13 +72,13 @@ export function composeStory<GenericArgs>(
 ) {
   if (isInvalidStory(story)) {
     throw new Error(
-      `Cannot compose story due to invalid format. @storybook/testing-angular expected a function but received ${typeof story} instead.`
+      `Cannot compose story due to invalid format. @marklb/storybook-testing-angular expected a function but received ${typeof story} instead.`
     );
   }
 
   if ((story as any).story !== undefined) {
     throw new Error(
-      `StoryFn.story object-style annotation is not supported. @storybook/testing-angular expects hoisted CSF stories.
+      `StoryFn.story object-style annotation is not supported. @marklb/storybook-testing-angular expects hoisted CSF stories.
        https://github.com/storybookjs/storybook/blob/next/MIGRATION.md#hoisted-csf-annotations`
     );
   }
@@ -164,17 +167,20 @@ export function composeStory<GenericArgs>(
  * It's very useful for reusing stories in scenarios outside of Storybook like unit testing.
  *
  * Example:
- *```jsx
- * import { render } from '@testing-library/react';
- * import { composeStories } from '@storybook/testing-react';
+ *```ts
+ * import { render, screen } from '@testing-library/angular';
+ * import { composeStory } from '@marklb/storybook-testing-angular';
  * import * as stories from './Button.stories';
  *
  * const { Primary, Secondary } = composeStories(stories);
  *
- * test('renders primary button with Hello World', () => {
- *   const { getByText } = render(<Primary>Hello world</Primary>);
- *   expect(getByText(/Hello world/i)).not.toBeNull();
- * });
+ * describe('button', () => {
+ *   test('renders primary button with Hello World', () => {
+ *     const { component, ngModule } = createMountableStoryComponent((Primary as any)({ label: 'Hello world' }));
+ *     await render(component, { imports: [ ngModule ] });
+ *     expect(screen.getByText(/Hello world/i)).not.toBeNull();
+ *   });
+ * })
  *```
  *
  * @param storiesImport - e.g. (import * as stories from './Button.stories')
