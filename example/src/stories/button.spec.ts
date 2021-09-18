@@ -9,7 +9,7 @@ import { TestBed } from '@angular/core/testing';
 const { Primary } = composeStories(stories);
 
 describe('button TestBed', () => {
-  const { component, ngModule } = createMountableStoryComponent((Primary as any)());
+  const { component, ngModule } = createMountableStoryComponent(Primary({}, {} as any));
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -35,8 +35,17 @@ describe('button TestBed', () => {
 
 describe('button testing-library', () => {
   it('renders primary button', async () => {
-    const { component, ngModule } = createMountableStoryComponent((Primary as any)());
+    const { component, ngModule } = createMountableStoryComponent(Primary({}, {} as any));
     await render(component, { imports: [ ngModule ] });
     expect(screen.getByText(Primary.args?.label!)).not.toBeNull();
-  })
-})
+  });
+
+  it('renders primary button with spy', async () => {
+    const onClickSpy = jasmine.createSpyObj('EventEmitter', [ 'emit' ]);
+    const { component, ngModule } = createMountableStoryComponent(Primary({ onClick: onClickSpy }, {} as any));
+    await render(component, { imports: [ ngModule ] });
+    const buttonElement = screen.getByText(Primary.args?.label!);
+    buttonElement.click();
+    expect(onClickSpy.emit).toHaveBeenCalled();
+  });
+});

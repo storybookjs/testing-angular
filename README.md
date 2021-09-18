@@ -8,13 +8,11 @@
 
 ## The problem
 
-<!-- TODO: Angular description -->
-<!-- You are using [Storybook](https://storybook.js.org/) for your components and writing tests for them with [jest](https://jestjs.io/), most likely alongside [Enzyme](https://enzymejs.github.io/enzyme/) or [React testing library](https://testing-library.com/). In your Storybook stories, you already defined the scenarios of your components. You also set up the necessary decorators (theming, routing, state management, etc.) to make them all render correctly. When you're writing tests, you also end up defining scenarios of your components, as well as setting up the necessary decorators. By doing the same thing twice, you feel like you're spending too much effort, making writing and maintaining stories/tests become less like fun and more like a burden. -->
+You are using [Storybook](https://storybook.js.org/) for your components and writing tests for them with [Jasmine test framework](https://jasmine.github.io/) or [Angular testing library](https://testing-library.com/), most likely with [Karma test runner](https://karma-runner.github.io/). In your Storybook stories, you already defined the scenarios of your components. You also set up the necessary decorators (theming, routing, state management, etc.) to make them all render correctly. When you're writing tests, you also end up defining scenarios of your components, as well as setting up the necessary decorators. By doing the same thing twice, you feel like you're spending too much effort, making writing and maintaining stories/tests become less like fun and more like a burden.
 
 ## The solution
 
-<!-- TODO: Angular description -->
-<!-- `@storybook/testing-react` is a solution to reuse your Storybook stories in your React tests. By reusing your stories in your tests, you have a catalog of component scenarios ready to be tested. All [args](https://storybook.js.org/docs/react/writing-stories/args) and [decorators](https://storybook.js.org/docs/react/writing-stories/decorators) from your [story](https://storybook.js.org/docs/react/api/csf#named-story-exports) and its [meta](https://storybook.js.org/docs/react/api/csf#default-export), and also [global decorators](https://storybook.js.org/docs/react/writing-stories/decorators#global-decorators), will be composed by this library and returned to you in a simple component. This way, in your unit tests, all you have to do is select which story you want to render, and all the necessary setup will be already done for you. This is the missing piece that allows for better shareability and maintenance between writing tests and writing Storybook stories. -->
+`@marklb/storybook-testing-angular` is a solution to reuse your Storybook stories in your Angular tests. By reusing your stories in your tests, you have a catalog of component scenarios ready to be tested. All [args](https://storybook.js.org/docs/angular/writing-stories/args) and [decorators](https://storybook.js.org/docs/angular/writing-stories/decorators) from your [story](https://storybook.js.org/docs/angular/api/csf#named-story-exports) and its [meta](https://storybook.js.org/docs/angular/api/csf#default-export), and also [global decorators](https://storybook.js.org/docs/angular/writing-stories/decorators#global-decorators), will be composed by this library and returned to you in a simple component. This way, in your unit tests, all you have to do is select which story you want to render, and all the necessary setup will be already done for you. This is the missing piece that allows for better shareability and maintenance between writing tests and writing Storybook stories.
 
 ## Installation
 
@@ -22,15 +20,14 @@ This library should be installed as one of your project's `devDependencies`:
 
 via [npm](https://www.npmjs.com/)
 
-<!-- TODO: Add published package -->
 <!-- ```
-npm install --save-dev @storybook/testing-react
+npm install --save-dev @marklb/storybook-testing-angular
 ```
 
 or via [yarn](https://classic.yarnpkg.com/)
 
 ```
-yarn add --dev @storybook/testing-react
+yarn add --dev @marklb/storybook-testing-angular
 ``` -->
 
 ## Setup
@@ -41,14 +38,16 @@ This library requires you to be using Storybook version 6, [Component Story Form
 
 Essentially, if you use Storybook 6 and your stories look similar to this, you're good to go!
 
-```jsx
+```ts
 // CSF: default export (meta) + named exports (stories)
 export default {
   title: 'Example/Button',
   component: Button,
-};
+} as Meta;
 
-const Primary = args => <Button {...args} />; // or with Template.bind({})
+const Primary: Story<Button> = args => (args: Button) => ({
+  props: args,
+}); // or with Template.bind({})
 Primary.args = {
   primary: true,
 };
@@ -58,23 +57,14 @@ Primary.args = {
 
 > This is an optional step. If you don't have [global decorators](https://storybook.js.org/docs/angular/writing-stories/decorators#global-decorators), there's no need to do this. However, if you do, this is a necessary step for your global decorators to be applied.
 
-If you have global decorators/parameters/etc and want them applied to your stories when testing them, you first need to set this up. You can do this by adding to or creating a jest [setup file](https://jestjs.io/docs/configuration#setupfiles-array):
+If you have global decorators/parameters/etc and want them applied to your stories when testing them, you first need to set this up. You can do this by adding to test [setup file](https://angular.io/guide/testing#configuration):
 
-```tsx
-// setupFile.js <-- this will run before the tests in jest.
-import { setGlobalConfig } from '@storybook/testing-react';
-import * as globalStorybookConfig from './.storybook/preview'; // path of your preview.js file
+```ts
+// test.ts <-- this will run before the tests in karma.
+import { setGlobalConfig } from '@marklb/storybook-testing-angular';
+import * as globalStorybookConfig from '../.storybook/preview'; // path of your preview.js file
 
 setGlobalConfig(globalStorybookConfig);
-```
-
-For the setup file to be picked up, you need to pass it as an option to jest in your test command:
-
-```json
-// package.json
-{
-  "test": "react-scripts test --setupFiles ./setupFile.js"
-}
 ```
 
 ## Usage
@@ -85,26 +75,34 @@ For the setup file to be picked up, you need to pass it as an option to jest in 
 
 If you use the composed story (e.g. PrimaryButton), the component will render with the args that are passed in the story. However, you are free to pass any props on top of the component, and those props will override the default values passed in the story's args.
 
-```tsx
-import { render, screen } from '@testing-library/react';
-import { composeStories } from '@storybook/testing-react';
+```ts
+import { render, screen } from '@testing-library/angular';
+import { composeStories } from '@marklb/storybook-testing-angular';
 import * as stories from './Button.stories'; // import all stories from the stories file
 
 // Every component that is returned maps 1:1 with the stories, but they already contain all decorators from story level, meta level and global level.
 const { Primary, Secondary } = composeStories(stories);
 
-test('renders primary button with default args', () => {
-  render(<Primary />);
-  const buttonElement = screen.getByText(
-    /Text coming from args in stories file!/i
-  );
-  expect(buttonElement).not.toBeNull();
-});
+describe('button', () => {
+  it('renders primary button with default args', () => {
+    const { component, ngModule } = createMountableStoryComponent(
+      Primary({}, {} as any)
+    );
+    await render(component, { imports: [ngModule] });
+    const buttonElement = screen.getByText(
+      /Text coming from args in stories file!/i
+    );
+    expect(buttonElement).not.toBeNull();
+  });
 
-test('renders primary button with overriden props', () => {
-  render(<Primary>Hello world</Primary>); // you can override props and they will get merged with values from the Story's args
-  const buttonElement = screen.getByText(/Hello world/i);
-  expect(buttonElement).not.toBeNull();
+  it('renders primary button with overriden props', () => {
+    const { component, ngModule } = createMountableStoryComponent(
+      Primary({ label: 'Hello world' }, {} as any)
+    ); // you can override props and they will get merged with values from the Story's args
+    await render(component, { imports: [ngModule] });
+    const buttonElement = screen.getByText(/Hello world/i);
+    expect(buttonElement).not.toBeNull();
+  });
 });
 ```
 
@@ -112,40 +110,47 @@ test('renders primary button with overriden props', () => {
 
 You can use `composeStory` if you wish to apply it for a single story rather than all of your stories. You need to pass the meta (default export) as well.
 
-```tsx
-import { render, screen } from '@testing-library/react';
-import { composeStory } from '@storybook/testing-react';
+```ts
+import { render, screen } from '@testing-library/angular';
+import { composeStory } from '@marklb/storybook-testing-angular';
 import Meta, { Primary as PrimaryStory } from './Button.stories';
 
 // Returns a component that already contain all decorators from story level, meta level and global level.
 const Primary = composeStory(PrimaryStory, Meta);
 
-test('onclick handler is called', async () => {
-  const onClickSpy = jest.fn();
-  render(<Primary onClick={onClickSpy} />);
-  const buttonElement = screen.getByRole('button');
-  buttonElement.click();
-  expect(onClickSpy).toHaveBeenCalled();
+describe('button', () => {
+  it('onclick handler is called', async () => {
+    const onClickSpy = jasmine.createSpyObj('EventEmitter', ['emit']);
+    const { component, ngModule } = createMountableStoryComponent(
+      Primary({ onClick: onClickSpy }, {} as any)
+    );
+    await render(component, { imports: [ngModule] });
+    const buttonElement = screen.getByText(Primary.args?.label!);
+    buttonElement.click();
+    expect(onClickSpy.emit).toHaveBeenCalled();
+  });
 });
 ```
 
 ### Reusing story properties
 
-The components returned by `composeStories` or `composeStory` not only can be rendered as React components, but also come with the combined properties from story, meta and global configuration. This means that if you want to access `args` or `parameters`, for instance, you can do so:
+The components returned by `composeStories` or `composeStory` not only can be rendered as Angular components, but also come with the combined properties from story, meta and global configuration. This means that if you want to access `args` or `parameters`, for instance, you can do so:
 
-```tsx
-import { render, screen } from '@testing-library/react';
-import { composeStory } from '@storybook/testing-react';
+```ts
+import { render, screen } from '@testing-library/angular';
+import { composeStory } from '@marklb/storybook-testing-angular';
 import * as stories from './Button.stories';
 
 const { Primary } = composeStories(stories);
 
-test('reuses args from composed story', () => {
-  render(<Primary />);
-
-  const buttonElement = screen.getByRole('button');
-  // Testing against values coming from the story itself! No need for duplication
-  expect(buttonElement.textContent).toEqual(Primary.args.children);
+describe('button', () => {
+  it('reuses args from composed story', async () => {
+    const { component, ngModule } = createMountableStoryComponent(
+      Primary({}, {} as any)
+    );
+    await render(component, { imports: [ngModule] });
+    expect(screen.getByText(Primary.args?.label!)).not.toBeNull();
+  });
 });
 ```
 
@@ -161,7 +166,7 @@ Primary.args!.children;
 
 ## Typescript
 
-`@storybook/testing-react` is typescript ready and provides autocompletion to easily detect all stories of your component:
+`@marklb/storybook-testing-angular` is typescript ready and provides autocompletion to easily detect all stories of your component:
 
 ![component autocompletion](https://user-images.githubusercontent.com/1671563/111436219-034d1600-8702-11eb-82bb-36913b235787.png)
 
@@ -188,24 +193,25 @@ Type inference is only possible in projects that have either `strict` or `strict
 
 For the types to be automatically picked up, your stories must be typed. See an example:
 
-```tsx
-import React from 'react';
-import { Story, Meta } from '@storybook/react';
+```ts
+import { Story, Meta } from '@storybook/angular';
 
-import { Button, ButtonProps } from './Button';
+import { ButtonComponent } from './Button.component';
 
 export default {
   title: 'Components/Button',
-  component: Button,
+  component: ButtonComponent,
 } as Meta;
 
 // Story<Props> is the key piece needed for typescript validation
-const Template: Story<ButtonProps> = args => <Button {...args} />;
+const Template: Story<ButtonComponent> = (args: Button) => ({
+  props: args,
+});
 
 export const Primary = Template.bind({});
 Primary.args = {
-  children: 'foo',
-  size: 'large',
+  primary: true,
+  label: 'Button',
 };
 ```
 

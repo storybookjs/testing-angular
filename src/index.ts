@@ -22,7 +22,7 @@ let globalStorybookConfig = {};
  * It should be run a single time, so that your global config (e.g. decorators) is applied to your stories when using `composeStories` or `composeStory`.
  *
  * Example:
- *```jsx
+ *```ts
  * // test.ts (for karma)
  * import { setGlobalConfig } from '@marklb/storybook-testing-angular';
  * import * as globalStorybookConfig from '../.storybook/preview';
@@ -53,8 +53,8 @@ export function setGlobalConfig(config: GlobalConfig) {
  * const Primary = composeStory(PrimaryStory, Meta);
  *
  * describe('button', () => {
- *   test('renders primary button with Hello World', () => {
- *     const { component, ngModule } = createMountableStoryComponent((Primary as any)({ label: 'Hello world' }));
+ *   it('renders primary button with Hello World', () => {
+ *     const { component, ngModule } = createMountableStoryComponent(Primary({ label: 'Hello world' }, {} as any));
  *     await render(component, { imports: [ ngModule ] });
  *     expect(screen.getByText(/Hello world/i)).not.toBeNull();
  *   });
@@ -175,8 +175,8 @@ export function composeStory<GenericArgs>(
  * const { Primary, Secondary } = composeStories(stories);
  *
  * describe('button', () => {
- *   test('renders primary button with Hello World', () => {
- *     const { component, ngModule } = createMountableStoryComponent((Primary as any)({ label: 'Hello world' }));
+ *   it('renders primary button with Hello World', () => {
+ *     const { component, ngModule } = createMountableStoryComponent(Primary({ label: 'Hello world' }, {} as any));
  *     await render(component, { imports: [ ngModule ] });
  *     expect(screen.getByText(/Hello world/i)).not.toBeNull();
  *   });
@@ -330,7 +330,13 @@ export class SbTestingRenderer {
   }
 }
 
-export function createMountableStoryComponent(story: Story): RenderableStoryAndModule {
+/**
+ * Function that will receive a StoryFnAngularReturnType and will return a Component and NgModule that renders the story.
+ * 
+ * @param story 
+ * @returns 
+ */
+export function createMountableStoryComponent(storyFnReturn: StoryFnAngularReturnType): RenderableStoryAndModule {
   const storyId = `storybook-testing-wrapper`;
   const renderer = new SbTestingRenderer(storyId);
 
@@ -348,7 +354,7 @@ export function createMountableStoryComponent(story: Story): RenderableStoryAndM
 
     ngAfterViewInit(): void {
       renderer.getRenderableComponent({
-        storyFnAngular: story as any,
+        storyFnAngular: storyFnReturn as any,
         forced: false,
         parameters: {} as any,
       });
@@ -357,23 +363,23 @@ export function createMountableStoryComponent(story: Story): RenderableStoryAndM
   }
 
   const _story: any = {
-    ...(story as any),
+    ...(storyFnReturn as any),
     moduleMetadata: {
       declarations: [
-        ...((story as any).moduleMetadata?.declarations ?? []),
+        ...((storyFnReturn as any).moduleMetadata?.declarations ?? []),
         SbTestingMountable,
       ],
       imports: [
-        ...((story as any).moduleMetadata?.imports ?? []),
+        ...((storyFnReturn as any).moduleMetadata?.imports ?? []),
       ],
       providers: [
-        ...((story as any).moduleMetadata?.providers ?? []),
+        ...((storyFnReturn as any).moduleMetadata?.providers ?? []),
       ],
       entryComponents: [
-        ...((story as any).moduleMetadata?.entryComponents ?? []),
+        ...((storyFnReturn as any).moduleMetadata?.entryComponents ?? []),
       ],
       schemas: [
-        ...((story as any).moduleMetadata?.schemas ?? []),
+        ...((storyFnReturn as any).moduleMetadata?.schemas ?? []),
       ],
       exports: [
         SbTestingMountable,
