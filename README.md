@@ -1,7 +1,6 @@
-<!-- TODO: Angular logo -->
-<!-- <p align="center">
-  <img src="https://user-images.githubusercontent.com/1671563/111436322-21b31180-8702-11eb-943f-93b5a0b02b50.png" alt="Storybook React Testing" width="100" />
-</p> -->
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/1671563/132940423-c8e09cff-7b08-4d35-bdcd-0f1263063f7b.png" alt="Storybook Testing Angular" width="100" />
+</p>
 
 <p align="center">Testing utilities that allow you to reuse your stories in your unit tests</p>
 

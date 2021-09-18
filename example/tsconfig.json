@@ -20,7 +20,11 @@
       "es2018",
       "dom"
     ],
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "paths": {
+      "@angular/*": [ "./node_modules/@angular/*" ],
+      "@marklb/storybook-testing-angular": [ "../dist" ]
+    }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

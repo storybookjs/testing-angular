@@ -2,12 +2,6 @@ import { StoryFnAngularReturnType } from '@storybook/angular/dist/ts3.9/client/p
 import { ArgTypes, Parameters, BaseDecorators } from '@storybook/addons';
 import type { Story } from '@storybook/angular';
 
-// interface ComponentType<T> {
-//   new (...args: any[]): T;
-// }
-
-// type StoryFnAngularReturnType = ComponentType<any>;
-
 /**
  * Object representing the preview.ts module
  *

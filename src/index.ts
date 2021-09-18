@@ -1,14 +1,15 @@
-import { AfterViewInit, Component, NgModule, NgZone, OnDestroy, Provider, Type } from '@angular/core';
+import { AfterViewInit, Component, NgModule, OnDestroy, Type } from '@angular/core';
 import addons, { mockChannel } from '@storybook/addons';
 import type { Meta, Story, StoryContext, Parameters } from '@storybook/angular';
 import { combineParameters, defaultDecorateStory } from '@storybook/client-api';
-import { createStorybookModule, getStorybookModuleMetadata } from '@storybook/angular/dist/ts3.9/client/preview/angular-beta/StorybookModule';
-import { STORY_PROPS } from '@storybook/angular/dist/ts3.9/client/preview/angular-beta/StorybookProvider';
+import {
+  createStorybookModule
+} from '@storybook/angular/dist/ts3.9/client/preview/angular-beta/StorybookModule';
 import { ICollection, StoryFnAngularReturnType } from '@storybook/angular/dist/ts3.9/client/preview/types';
-import { BehaviorSubject, Observable, Subject, Subscriber } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { stringify } from 'telejson';
 
-
+import { isInvalidStory, getStorybookModuleMetadata } from './utils';
 import type { GlobalConfig, StoriesWithPartialProps } from './types';
 
 // Some addons use the channel api to communicate between manager/preview, and this is a client only feature, therefore we must mock it.
@@ -66,11 +67,11 @@ export function composeStory<GenericArgs>(
   meta: Meta,
   globalConfig: GlobalConfig = globalStorybookConfig
 ) {
-  // if (typeof story !== 'function') {
-  //   throw new Error(
-  //     `Cannot compose story due to invalid format. @storybook/testing-angular expected a function but received ${typeof story} instead.`
-  //   );
-  // }
+  if (isInvalidStory(story)) {
+    throw new Error(
+      `Cannot compose story due to invalid format. @storybook/testing-angular expected a function but received ${typeof story} instead.`
+    );
+  }
 
   if ((story as any).story !== undefined) {
     throw new Error(
@@ -107,27 +108,27 @@ export function composeStory<GenericArgs>(
 
   const decorated = defaultDecorateStory(
     finalStoryFn as any,
-    combinedDecorators as any
+    combinedDecorators as any,
   );
 
   const defaultGlobals = Object.entries(
     (globalConfig.globalTypes || {}) as Record<string, { defaultValue: any }>
   ).reduce((acc, [arg, { defaultValue }]) => {
     if (defaultValue) {
-      acc[arg] = defaultValue
+      acc[arg] = defaultValue;
     }
-    return acc
+    return acc;
   }, {} as Record<string, { defaultValue: any }>);
 
   const combinedParameters = combineParameters(
     globalConfig.parameters || {},
     meta.parameters || {},
-    story.parameters || {}
+    story.parameters || {},
   );
 
   const combinedArgs = {
     ...meta.args,
-    ...story.args
+    ...story.args,
   };
 
   const composedStory = (extraArgs: Record<string, any>) => {
@@ -190,39 +191,30 @@ export function composeStories<
       storiesMap[key] = composeStory(story as Story, meta, globalConfig)
       return storiesMap
     },
-    {} as { [key: string]: Story }
+    {} as { [key: string]: Story },
   );
 
   return composedStories as StoriesWithPartialProps<T>;
 }
 
-
-
-
-
-
-
-
-
-
 interface StoryRenderInfo {
-  storyFnAngular: StoryFnAngularReturnType
-  moduleMetadataSnapshot: string
+  storyFnAngular: StoryFnAngularReturnType;
+  moduleMetadataSnapshot: string;
 }
 
-interface RenderableStoryAndModule {
-  component: any
-  module: Type<any>
+export interface RenderableStoryAndModule {
+  component: any;
+  ngModule: Type<any>;
 }
 
 export class SbTestingRenderer {
 
-  protected previousStoryRenderInfo?: StoryRenderInfo
+  protected previousStoryRenderInfo?: StoryRenderInfo;
 
   // Observable to change the properties dynamically without reloading angular module&component
-  public storyProps$: Subject<ICollection> = new Subject<ICollection>()
+  public storyProps$: Subject<ICollection | undefined> = new Subject<ICollection | undefined>();
 
-  protected isFirstRender: boolean = true
+  protected isFirstRender: boolean = true;
 
   constructor(public storyId: string) {}
 
@@ -235,13 +227,14 @@ export class SbTestingRenderer {
     forced: boolean;
     parameters: Parameters;
   }): Type<any> | null {
-    const targetSelector = `${this.storyId}`
+    const targetSelector = `${this.storyId}`;
 
-    const newStoryProps$ = new BehaviorSubject<ICollection>(storyFnAngular.props ?? {})
+    const newStoryProps$ = new BehaviorSubject<ICollection | undefined>(storyFnAngular.props ?? {});
     const _moduleMetadata = getStorybookModuleMetadata(
       { storyFnAngular, parameters, targetSelector },
       newStoryProps$
-    )
+    );
+
     const moduleMetadata = {
       declarations: [
         ...(_moduleMetadata.declarations ?? [])
@@ -258,10 +251,7 @@ export class SbTestingRenderer {
       schemas: [
         ...(_moduleMetadata.schemas ?? [])
       ],
-      exports: [
-        ...((storyFnAngular.moduleMetadata as any).exports ?? []),
-      ],
-    }
+    };
 
     if (
       !this.fullRendererRequired({
@@ -270,24 +260,24 @@ export class SbTestingRenderer {
         forced,
       })
     ) {
-      this.storyProps$.next(storyFnAngular.props)
+      this.storyProps$.next(storyFnAngular.props);
 
-      return null
+      return null;
     }
 
     if (!this.isFirstRender) {
-      return null
+      return null;
     }
 
-    this.storyProps$ = newStoryProps$
+    this.storyProps$ = newStoryProps$;
 
-    return createStorybookModule(moduleMetadata)
+    return createStorybookModule(moduleMetadata);
   }
 
   public completeStory(): void {
     // Complete last BehaviorSubject and set a new one for the current module
     if (this.storyProps$) {
-      this.storyProps$.complete()
+      this.storyProps$.complete();
     }
   }
 
@@ -300,14 +290,14 @@ export class SbTestingRenderer {
     moduleMetadata: NgModule;
     forced: boolean;
   }) {
-    const { previousStoryRenderInfo } = this
+    const { previousStoryRenderInfo } = this;
 
     const currentStoryRender = {
       storyFnAngular,
       moduleMetadataSnapshot: stringify(moduleMetadata),
-    }
+    };
 
-    this.previousStoryRenderInfo = currentStoryRender
+    this.previousStoryRenderInfo = currentStoryRender;
 
     if (
       // check `forceRender` of story RenderContext
@@ -315,7 +305,7 @@ export class SbTestingRenderer {
       // if it's the first rendering and storyProps$ is not init
       !this.storyProps$
     ) {
-      return true
+      return true;
     }
 
     // force the rendering if the template has changed
@@ -323,68 +313,31 @@ export class SbTestingRenderer {
       !!storyFnAngular?.template &&
       previousStoryRenderInfo?.storyFnAngular?.template !== storyFnAngular.template
     if (hasChangedTemplate) {
-      return true
+      return true;
     }
 
     // force the rendering if the metadata structure has changed
     const hasChangedModuleMetadata =
-      currentStoryRender.moduleMetadataSnapshot !== previousStoryRenderInfo?.moduleMetadataSnapshot
+      currentStoryRender.moduleMetadataSnapshot !== previousStoryRenderInfo?.moduleMetadataSnapshot;
 
-    return hasChangedModuleMetadata
+    return hasChangedModuleMetadata;
   }
 }
 
-
-
-
-
-const _storyPropsProvider = (storyProps$: () => Subject<ICollection | undefined>): Provider => ({
-  provide: STORY_PROPS,
-  // useFactory: storyDataFactory(storyProps$.asObservable()),
-  useFactory: storyDataFactory(storyProps$),
-  deps: [NgZone],
-})
-
-function storyDataFactory<T>(data: () => Observable<T>) {
-  return (ngZone: NgZone) =>
-    new Observable((subscriber: Subscriber<T>) => {
-      const sub = data().subscribe(
-        (v: T) => {
-          ngZone.run(() => subscriber.next(v))
-        },
-        (err) => {
-          ngZone.run(() => subscriber.error(err))
-        },
-        () => {
-          ngZone.run(() => subscriber.complete())
-        }
-      )
-
-      return () => {
-        sub.unsubscribe()
-      }
-    })
-}
-
-
-
 export function createMountableStoryComponent(story: Story): RenderableStoryAndModule {
+  const storyId = `storybook-testing-wrapper`;
+  const renderer = new SbTestingRenderer(storyId);
 
-  const storyId = 'testing-story'
-  const renderer = new SbTestingRenderer(storyId)
-
+  // This additional wrapper can probably be avoided by making some changes to
+  // the renderer or wrapper component in '@storybook/angular'.
   @Component({
-    selector: 'sb-testing-mount',
-    template: `<${storyId}></${storyId}>`,
-    providers: [
-      // storyPropsProvider(renderer.storyProps$ as any)
-      _storyPropsProvider(() => renderer.storyProps$ as any)
-    ],
+    selector: 'sb-testing-mountable',
+    template: `<${storyId}></${storyId}>`
   })
-  class SbTestingMount implements OnDestroy, AfterViewInit {
+  class SbTestingMountable implements OnDestroy, AfterViewInit {
 
     ngOnDestroy(): void {
-      renderer.completeStory()
+      renderer.completeStory();
     }
 
     ngAfterViewInit(): void {
@@ -392,52 +345,48 @@ export function createMountableStoryComponent(story: Story): RenderableStoryAndM
         storyFnAngular: story as any,
         forced: false,
         parameters: {} as any,
-      })
-
+      });
     }
 
   }
-
-  const _storyTmp: any = story
 
   const _story: any = {
-    ..._storyTmp,
+    ...(story as any),
     moduleMetadata: {
       declarations: [
-        ...(_storyTmp.moduleMetadata?.declarations ?? []),
-        SbTestingMount
+        ...((story as any).moduleMetadata?.declarations ?? []),
+        SbTestingMountable,
       ],
       imports: [
-        ...(_storyTmp.moduleMetadata?.imports ?? [])
+        ...((story as any).moduleMetadata?.imports ?? []),
       ],
       providers: [
-        ...(_storyTmp.moduleMetadata?.providers ?? [])
+        ...((story as any).moduleMetadata?.providers ?? []),
       ],
       entryComponents: [
-        ...(_storyTmp.moduleMetadata?.entryComponents ?? [])
+        ...((story as any).moduleMetadata?.entryComponents ?? []),
       ],
       schemas: [
-        ...(_storyTmp.moduleMetadata?.schemas ?? [])
+        ...((story as any).moduleMetadata?.schemas ?? []),
       ],
       exports: [
-        ...(_storyTmp.moduleMetadata?.exports ?? []),
-        SbTestingMount
+        SbTestingMountable,
       ],
     }
-  }
+  };
 
   const _module = renderer.getRenderableComponent({
-    storyFnAngular: _story as any,
+    storyFnAngular: _story,
     forced: false,
     parameters: {} as any,
-  })
+  });
 
   if (_module === null) {
-    throw Error(`Must initially have module`)
+    throw Error(`Must initially have module`);
   }
 
   return {
-    component: SbTestingMount,
-    module: _module
-  }
+    component: SbTestingMountable,
+    ngModule: _module
+  };
 }
