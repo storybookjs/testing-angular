@@ -7,6 +7,11 @@ import {
   platformBrowserDynamicTesting
 } from '@angular/platform-browser-dynamic/testing';
 
+import * as globalStorybookConfig from '../.storybook/preview'; // path of your preview.js file
+import { setGlobalConfig } from '@marklb/storybook-testing-angular'
+
+setGlobalConfig(globalStorybookConfig);
+
 declare const require: {
   context(path: string, deep?: boolean, filter?: RegExp): {
     keys(): string[];
