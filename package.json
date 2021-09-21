@@ -1,6 +1,6 @@
 {
-  "name": "@marklb/storybook-testing-angular",
-  "version": "0.0.6",
+  "name": "@storybook/testing-angular",
+  "version": "0.0.1",
   "description": "Testing utilities that allow you to reuse your stories in your unit tests",
   "keywords": [
     "storybook-addons",
@@ -12,7 +12,7 @@
   "typings": "dist/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/marklb/storybook-testing-angular"
+    "url": "https://github.com/storybook/testing-angular"
   },
   "files": [
     "dist",
@@ -49,14 +49,14 @@
     "trailingComma": "es5"
   },
   "author": "markberry867@gmail.com",
-  "module": "dist/storybook-testing-angular.esm.js",
+  "module": "dist/testing-angular.esm.js",
   "size-limit": [
     {
-      "path": "dist/storybook-testing-angular.cjs.production.min.js",
+      "path": "dist/testing-angular.cjs.production.min.js",
       "limit": "10 KB"
     },
     {
-      "path": "dist/storybook-testing-angular.esm.js",
+      "path": "dist/testing-angular.esm.js",
       "limit": "10 KB"
     }
   ],

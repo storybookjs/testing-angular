@@ -12,7 +12,7 @@ You are using [Storybook](https://storybook.js.org/) for your components and wri
 
 ## The solution
 
-`@marklb/storybook-testing-angular` is a solution to reuse your Storybook stories in your Angular tests. By reusing your stories in your tests, you have a catalog of component scenarios ready to be tested. All [args](https://storybook.js.org/docs/angular/writing-stories/args) and [decorators](https://storybook.js.org/docs/angular/writing-stories/decorators) from your [story](https://storybook.js.org/docs/angular/api/csf#named-story-exports) and its [meta](https://storybook.js.org/docs/angular/api/csf#default-export), and also [global decorators](https://storybook.js.org/docs/angular/writing-stories/decorators#global-decorators), will be composed by this library and returned to you in a simple component. This way, in your unit tests, all you have to do is select which story you want to render, and all the necessary setup will be already done for you. This is the missing piece that allows for better shareability and maintenance between writing tests and writing Storybook stories.
+`@storybook/testing-angular` is a solution to reuse your Storybook stories in your Angular tests. By reusing your stories in your tests, you have a catalog of component scenarios ready to be tested. All [args](https://storybook.js.org/docs/angular/writing-stories/args) and [decorators](https://storybook.js.org/docs/angular/writing-stories/decorators) from your [story](https://storybook.js.org/docs/angular/api/csf#named-story-exports) and its [meta](https://storybook.js.org/docs/angular/api/csf#default-export), and also [global decorators](https://storybook.js.org/docs/angular/writing-stories/decorators#global-decorators), will be composed by this library and returned to you in a simple component. This way, in your unit tests, all you have to do is select which story you want to render, and all the necessary setup will be already done for you. This is the missing piece that allows for better shareability and maintenance between writing tests and writing Storybook stories.
 
 ## Installation
 
@@ -21,13 +21,13 @@ This library should be installed as one of your project's `devDependencies`:
 via [npm](https://www.npmjs.com/)
 
 <!-- ```
-npm install --save-dev @marklb/storybook-testing-angular
+npm install --save-dev @storybook/testing-angular
 ```
 
 or via [yarn](https://classic.yarnpkg.com/)
 
 ```
-yarn add --dev @marklb/storybook-testing-angular
+yarn add --dev @storybook/testing-angular
 ``` -->
 
 ## Setup
@@ -61,7 +61,7 @@ If you have global decorators/parameters/etc and want them applied to your stori
 
 ```ts
 // test.ts <-- this will run before the tests in karma.
-import { setGlobalConfig } from '@marklb/storybook-testing-angular';
+import { setGlobalConfig } from '@storybook/testing-angular';
 import * as globalStorybookConfig from '../.storybook/preview'; // path of your preview.js file
 
 setGlobalConfig(globalStorybookConfig);
@@ -77,7 +77,7 @@ If you use the composed story (e.g. PrimaryButton), the component will render wi
 
 ```ts
 import { render, screen } from '@testing-library/angular';
-import { composeStories } from '@marklb/storybook-testing-angular';
+import { composeStories } from '@storybook/testing-angular';
 import * as stories from './Button.stories'; // import all stories from the stories file
 
 // Every component that is returned maps 1:1 with the stories, but they already contain all decorators from story level, meta level and global level.
@@ -112,7 +112,7 @@ You can use `composeStory` if you wish to apply it for a single story rather tha
 
 ```ts
 import { render, screen } from '@testing-library/angular';
-import { composeStory } from '@marklb/storybook-testing-angular';
+import { composeStory } from '@storybook/testing-angular';
 import Meta, { Primary as PrimaryStory } from './Button.stories';
 
 // Returns a component that already contain all decorators from story level, meta level and global level.
@@ -138,7 +138,7 @@ The components returned by `composeStories` or `composeStory` not only can be re
 
 ```ts
 import { render, screen } from '@testing-library/angular';
-import { composeStory } from '@marklb/storybook-testing-angular';
+import { composeStory } from '@storybook/testing-angular';
 import * as stories from './Button.stories';
 
 const { Primary } = composeStories(stories);
@@ -166,7 +166,7 @@ Primary.args!.children;
 
 ## Typescript
 
-`@marklb/storybook-testing-angular` is typescript ready and provides autocompletion to easily detect all stories of your component:
+`@storybook/testing-angular` is typescript ready and provides autocompletion to easily detect all stories of your component:
 
 ![component autocompletion](https://user-images.githubusercontent.com/1671563/111436219-034d1600-8702-11eb-82bb-36913b235787.png)
 

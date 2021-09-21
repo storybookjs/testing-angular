@@ -24,7 +24,7 @@ let globalStorybookConfig = {};
  * Example:
  *```ts
  * // test.ts (for karma)
- * import { setGlobalConfig } from '@marklb/storybook-testing-angular';
+ * import { setGlobalConfig } from '@storybook/testing-angular';
  * import * as globalStorybookConfig from '../.storybook/preview';
  *
  * setGlobalConfig(globalStorybookConfig);
@@ -47,7 +47,7 @@ export function setGlobalConfig(config: GlobalConfig) {
  * Example:
  *```ts
  * import { render, screen } from '@testing-library/angular';
- * import { composeStory } from '@marklb/storybook-testing-angular';
+ * import { composeStory } from '@storybook/testing-angular';
  * import Meta, { Primary as PrimaryStory } from './Button.stories';
  *
  * const Primary = composeStory(PrimaryStory, Meta);
@@ -72,13 +72,13 @@ export function composeStory<GenericArgs>(
 ) {
   if (isInvalidStory(story)) {
     throw new Error(
-      `Cannot compose story due to invalid format. @marklb/storybook-testing-angular expected a function but received ${typeof story} instead.`
+      `Cannot compose story due to invalid format. @storybook/testing-angular expected a function but received ${typeof story} instead.`
     );
   }
 
   if ((story as any).story !== undefined) {
     throw new Error(
-      `StoryFn.story object-style annotation is not supported. @marklb/storybook-testing-angular expects hoisted CSF stories.
+      `StoryFn.story object-style annotation is not supported. @storybook/testing-angular expects hoisted CSF stories.
        https://github.com/storybookjs/storybook/blob/next/MIGRATION.md#hoisted-csf-annotations`
     );
   }
@@ -169,7 +169,7 @@ export function composeStory<GenericArgs>(
  * Example:
  *```ts
  * import { render, screen } from '@testing-library/angular';
- * import { composeStory } from '@marklb/storybook-testing-angular';
+ * import { composeStory } from '@storybook/testing-angular';
  * import * as stories from './Button.stories';
  *
  * const { Primary, Secondary } = composeStories(stories);

@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/angular';
-import { composeStories, createMountableStoryComponent } from '@marklb/storybook-testing-angular'
+import { composeStories, createMountableStoryComponent } from '@storybook/testing-angular';
 
 import * as stories from './Button.stories'; // import all stories from the stories file
 

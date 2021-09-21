@@ -23,7 +23,7 @@
     "allowSyntheticDefaultImports": true,
     "paths": {
       "@angular/*": [ "./node_modules/@angular/*" ],
-      "@marklb/storybook-testing-angular": [ "../dist" ]
+      "@storybook/testing-angular": [ "../dist" ]
     }
   },
   "angularCompilerOptions": {

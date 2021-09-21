@@ -8,7 +8,7 @@ import {
 } from '@angular/platform-browser-dynamic/testing';
 
 import * as globalStorybookConfig from '../.storybook/preview'; // path of your preview.js file
-import { setGlobalConfig } from '@marklb/storybook-testing-angular'
+import { setGlobalConfig } from '@storybook/testing-angular';
 
 setGlobalConfig(globalStorybookConfig);
 
