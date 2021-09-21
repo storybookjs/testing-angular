@@ -1,4 +1,4 @@
-import { StoryFnAngularReturnType } from '@storybook/angular/dist/ts3.9/client/preview/types'
+import { StoryFnAngularReturnType } from '@storybook/angular/dist/ts3.9/client/preview/types';
 import { ArgTypes, Parameters, BaseDecorators } from '@storybook/addons';
 import type { Story } from '@storybook/angular';
 
@@ -22,5 +22,5 @@ export type GlobalConfig = {
  * 3. reconstruct Story with Partial. Story<Props> -> Story<Partial<Props>>
  */
 export type StoriesWithPartialProps<T> = { 
-  [K in keyof T as T[K] extends Story<any> ? K : never]: T[K] extends Story<infer P> ? Story<Partial<P>> : unknown 
+  [K in keyof T as T[K] extends Story<any> ? K : never]: T[K] extends Story<infer P> ? Story<Partial<P>> : unknown;
 }

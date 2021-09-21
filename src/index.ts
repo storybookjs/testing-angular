@@ -238,24 +238,24 @@ export class SbTestingRenderer {
     const newStoryProps$ = new BehaviorSubject<ICollection | undefined>(storyFnAngular.props ?? {});
     const _moduleMetadata = getStorybookModuleMetadata(
       { storyFnAngular, parameters, targetSelector },
-      newStoryProps$
+      newStoryProps$,
     );
 
     const moduleMetadata = {
       declarations: [
-        ...(_moduleMetadata.declarations ?? [])
+        ...(_moduleMetadata.declarations ?? []),
       ],
       imports: [
-        ...(_moduleMetadata.imports ?? [])
+        ...(_moduleMetadata.imports ?? []),
       ],
       providers: [
-        ...(_moduleMetadata.providers ?? [])
+        ...(_moduleMetadata.providers ?? []),
       ],
       entryComponents: [
-        ...(_moduleMetadata.entryComponents ?? [])
+        ...(_moduleMetadata.entryComponents ?? []),
       ],
       schemas: [
-        ...(_moduleMetadata.schemas ?? [])
+        ...(_moduleMetadata.schemas ?? []),
       ],
     };
 
@@ -317,7 +317,7 @@ export class SbTestingRenderer {
     // force the rendering if the template has changed
     const hasChangedTemplate =
       !!storyFnAngular?.template &&
-      previousStoryRenderInfo?.storyFnAngular?.template !== storyFnAngular.template
+      previousStoryRenderInfo?.storyFnAngular?.template !== storyFnAngular.template;
     if (hasChangedTemplate) {
       return true;
     }
@@ -344,7 +344,7 @@ export function createMountableStoryComponent(storyFnReturn: StoryFnAngularRetur
   // the renderer or wrapper component in '@storybook/angular'.
   @Component({
     selector: 'sb-testing-mountable',
-    template: `<${storyId}></${storyId}>`
+    template: `<${storyId}></${storyId}>`,
   })
   class SbTestingMountable implements OnDestroy, AfterViewInit {
 
@@ -399,6 +399,6 @@ export function createMountableStoryComponent(storyFnReturn: StoryFnAngularRetur
 
   return {
     component: SbTestingMountable,
-    ngModule: _module
+    ngModule: _module,
   };
 }

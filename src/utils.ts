@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import {
   ICollection,
-  StoryFnAngularReturnType
+  StoryFnAngularReturnType,
 } from '@storybook/angular/dist/ts3.9/client/preview/types';
-import { Subject } from 'rxjs'
+import { Subject } from 'rxjs';
 import { Parameters } from '@storybook/angular/types-6-0';
 import { storyPropsProvider } from '@storybook/angular/dist/ts3.9/client/preview/angular-beta/StorybookProvider';
 import { isComponentAlreadyDeclaredInModules } from '@storybook/angular/dist/ts3.9/client/preview/angular-beta/utils/NgModulesAnalyzer';
@@ -14,7 +14,8 @@ import { BrowserModule } from '@angular/platform-browser';
 
 const invalidStoryTypes = new Set(['string', 'number', 'boolean', 'symbol']);
 
-export const isInvalidStory = (story?: any) => (!story || Array.isArray(story) || invalidStoryTypes.has(typeof story));
+export const isInvalidStory = (story?: any) =>
+  !story || Array.isArray(story) || invalidStoryTypes.has(typeof story);
 
 // This can probably be avoided by making changes to this method in `@storybook/angular`.
 // Without reimplementing this here:
@@ -33,7 +34,12 @@ export const getStorybookModuleMetadata = (
   },
   storyProps$: Subject<ICollection | undefined>
 ): NgModule => {
-  const { component: storyComponent, props, styles, moduleMetadata = {} } = storyFnAngular;
+  const {
+    component: storyComponent,
+    props,
+    styles,
+    moduleMetadata = {},
+  } = storyFnAngular;
   let { template } = storyFnAngular;
 
   const component = storyComponent ?? parameters.component;
@@ -78,6 +84,8 @@ export const getStorybookModuleMetadata = (
   };
 };
 
-function hasNoTemplate(template: string | null | undefined): template is undefined {
+function hasNoTemplate(
+  template: string | null | undefined
+): template is undefined {
   return template === null || template === undefined;
 }
