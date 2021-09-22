@@ -77,7 +77,10 @@ If you use the composed story (e.g. PrimaryButton), the component will render wi
 
 ```ts
 import { render, screen } from '@testing-library/angular';
-import { composeStories } from '@storybook/testing-angular';
+import {
+  composeStories,
+  createMountableStoryComponent,
+} from '@storybook/testing-angular';
 import * as stories from './Button.stories'; // import all stories from the stories file
 
 // Every component that is returned maps 1:1 with the stories, but they already contain all decorators from story level, meta level and global level.
@@ -112,7 +115,10 @@ You can use `composeStory` if you wish to apply it for a single story rather tha
 
 ```ts
 import { render, screen } from '@testing-library/angular';
-import { composeStory } from '@storybook/testing-angular';
+import {
+  composeStory,
+  createMountableStoryComponent,
+} from '@storybook/testing-angular';
 import Meta, { Primary as PrimaryStory } from './Button.stories';
 
 // Returns a component that already contain all decorators from story level, meta level and global level.
@@ -138,7 +144,10 @@ The components returned by `composeStories` or `composeStory` not only can be re
 
 ```ts
 import { render, screen } from '@testing-library/angular';
-import { composeStory } from '@storybook/testing-angular';
+import {
+  composeStory,
+  createMountableStoryComponent,
+} from '@storybook/testing-angular';
 import * as stories from './Button.stories';
 
 const { Primary } = composeStories(stories);
