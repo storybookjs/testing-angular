@@ -1,3 +1,15 @@
+# v0.0.9 (Sat Sep 25 2021)
+
+#### ⚠️ Pushed to `main`
+
+- Fix typo and consistency in README ([@Marklb](https://github.com/Marklb))
+
+#### Authors: 1
+
+- Mark Berry ([@Marklb](https://github.com/Marklb))
+
+---
+
 # v0.0.8 (Wed Sep 22 2021)
 
 #### ⚠️ Pushed to `main`
