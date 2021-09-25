@@ -45,7 +45,7 @@ export default {
   component: Button,
 } as Meta;
 
-const Primary: Story<Button> = args => (args: Button) => ({
+const Primary: Story<ButtonComponent> = args => (args: ButtonComponent) => ({
   props: args,
 }); // or with Template.bind({})
 Primary.args = {
@@ -81,7 +81,7 @@ import {
   composeStories,
   createMountableStoryComponent,
 } from '@storybook/testing-angular';
-import * as stories from './Button.stories'; // import all stories from the stories file
+import * as stories from './button.stories'; // import all stories from the stories file
 
 // Every component that is returned maps 1:1 with the stories, but they already contain all decorators from story level, meta level and global level.
 const { Primary, Secondary } = composeStories(stories);
@@ -119,7 +119,7 @@ import {
   composeStory,
   createMountableStoryComponent,
 } from '@storybook/testing-angular';
-import Meta, { Primary as PrimaryStory } from './Button.stories';
+import Meta, { Primary as PrimaryStory } from './button.stories';
 
 // Returns a component that already contain all decorators from story level, meta level and global level.
 const Primary = composeStory(PrimaryStory, Meta);
@@ -148,7 +148,7 @@ import {
   composeStory,
   createMountableStoryComponent,
 } from '@storybook/testing-angular';
-import * as stories from './Button.stories';
+import * as stories from './button.stories';
 
 const { Primary } = composeStories(stories);
 
@@ -205,7 +205,7 @@ For the types to be automatically picked up, your stories must be typed. See an 
 ```ts
 import { Story, Meta } from '@storybook/angular';
 
-import { ButtonComponent } from './Button.component';
+import { ButtonComponent } from './button.component';
 
 export default {
   title: 'Components/Button',
@@ -213,7 +213,7 @@ export default {
 } as Meta;
 
 // Story<Props> is the key piece needed for typescript validation
-const Template: Story<ButtonComponent> = (args: Button) => ({
+const Template: Story<ButtonComponent> = (args: ButtonComponent) => ({
   props: args,
 });
 
