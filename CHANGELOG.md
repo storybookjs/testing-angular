@@ -1,3 +1,15 @@
+# v0.0.12 (Thu Nov 25 2021)
+
+#### ⚠️ Pushed to `main`
+
+- Fix first render check ([@Marklb](https://github.com/Marklb))
+
+#### Authors: 1
+
+- Mark Berry ([@Marklb](https://github.com/Marklb))
+
+---
+
 # v0.0.10 (Thu Nov 25 2021)
 
 #### ⚠️ Pushed to `main`
