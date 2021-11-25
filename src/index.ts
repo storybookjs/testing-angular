@@ -267,12 +267,11 @@ export class SbTestingRenderer {
       })
     ) {
       this.storyProps$.next(storyFnAngular.props);
-
+      this.isFirstRender = false;
       return null;
     }
 
     if (!this.isFirstRender) {
-      this.isFirstRender = false
       return null;
     }
 
