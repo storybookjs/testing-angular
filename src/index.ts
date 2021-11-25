@@ -272,6 +272,7 @@ export class SbTestingRenderer {
     }
 
     if (!this.isFirstRender) {
+      this.isFirstRender = false
       return null;
     }
 
