@@ -1,207 +1,149 @@
-import { AfterViewInit, Component, NgModule, OnDestroy, Type } from '@angular/core';
-import addons, { mockChannel } from '@storybook/addons';
-import type { Meta, Story, StoryContext, Parameters } from '@storybook/angular';
-import { combineParameters, defaultDecorateStory } from '@storybook/client-api';
+import { AfterViewInit, ApplicationConfig, Component, NgModule, OnDestroy, Type } from '@angular/core';
+import type {
+  Meta,
+  // Story, StoryContext, Parameters,
+  AngularRenderer
+} from '@storybook/angular';
 import {
-  createStorybookModule
-} from '@storybook/angular/dist/ts3.9/client/preview/angular-beta/StorybookModule';
-import { ICollection, StoryFnAngularReturnType } from '@storybook/angular/dist/ts3.9/client/preview/types';
+  composeStory as originalComposeStory,
+  composeStories as originalComposeStories,
+  setProjectAnnotations as originalSetProjectAnnotations,
+} from '@storybook/preview-api';
+import type {
+  Args,
+  ProjectAnnotations,
+  ComposedStory,
+  Store_CSFExports,
+  StoriesWithPartialProps,
+} from '@storybook/types';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { stringify } from 'telejson';
 
-import { isInvalidStory, getStorybookModuleMetadata } from './utils';
-import type { GlobalConfig, StoriesWithPartialProps } from './types';
-
-// Some addons use the channel api to communicate between manager/preview, and this is a client only feature, therefore we must mock it.
-addons.setChannel(mockChannel());
-
-let globalStorybookConfig = {};
+// import { isInvalidStory, getStorybookModuleMetadata } from './utils';
+import { ICollection, StoryFnAngularReturnType } from '@storybook/angular/dist/client/types';
+import { render } from '@storybook/angular/dist/client/render'
+import { getApplication, storyPropsProvider } from '@storybook/angular/renderer'
+import { PropertyExtractor } from '@storybook/angular/dist/client/angular-beta/utils/PropertyExtractor';
+// import type { GlobalConfig, StoriesWithPartialProps } from './types';
 
 /** Function that sets the globalConfig of your storybook. The global config is the preview module of your .storybook folder.
  *
  * It should be run a single time, so that your global config (e.g. decorators) is applied to your stories when using `composeStories` or `composeStory`.
  *
  * Example:
- *```ts
- * // test.ts (for karma)
- * import { setGlobalConfig } from '@storybook/testing-angular';
- * import * as globalStorybookConfig from '../.storybook/preview';
+ *```jsx
+ * // setup.js (for jest)
+ * import { setProjectAnnotations } from '@storybook/react';
+ * import * as projectAnnotations from './.storybook/preview';
  *
- * setGlobalConfig(globalStorybookConfig);
+ * setProjectAnnotations(projectAnnotations);
  *```
  *
- * @param config - e.g. (import * as globalConfig from '../.storybook/preview')
+ * @param projectAnnotations - e.g. (import * as projectAnnotations from '../.storybook/preview')
  */
-export function setGlobalConfig(config: GlobalConfig) {
-  globalStorybookConfig = config;
+export function setProjectAnnotations(
+  projectAnnotations: ProjectAnnotations<AngularRenderer> | ProjectAnnotations<AngularRenderer>[]
+) {
+  originalSetProjectAnnotations<AngularRenderer>(projectAnnotations);
 }
+
+/** Preserved for users migrating from `@storybook/testing-react`.
+ *
+ * @deprecated Use setProjectAnnotations instead
+ */
+export function setGlobalConfig(
+  projectAnnotations: ProjectAnnotations<AngularRenderer> | ProjectAnnotations<AngularRenderer>[]
+) {
+  // deprecate(`setGlobalConfig is deprecated. Use setProjectAnnotations instead.`);
+  setProjectAnnotations(projectAnnotations);
+}
+
+// This will not be necessary once we have auto preset loading
+const defaultProjectAnnotations: ProjectAnnotations<AngularRenderer> = {
+  render,
+};
 
 /**
  * Function that will receive a story along with meta (e.g. a default export from a .stories file)
- * and optionally a globalConfig e.g. (import * from '../.storybook/preview)
+ * and optionally projectAnnotations e.g. (import * from '../.storybook/preview)
  * and will return a composed component that has all args/parameters/decorators/etc combined and applied to it.
  *
  *
  * It's very useful for reusing a story in scenarios outside of Storybook like unit testing.
  *
  * Example:
- *```ts
- * import { render, screen } from '@testing-library/angular';
- * import { composeStory } from '@storybook/testing-angular';
+ *```jsx
+ * import { render } from '@testing-library/react';
+ * import { composeStory } from '@storybook/react';
  * import Meta, { Primary as PrimaryStory } from './Button.stories';
  *
  * const Primary = composeStory(PrimaryStory, Meta);
  *
- * describe('button', () => {
- *   it('renders primary button with Hello World', () => {
- *     const { component, ngModule } = createMountableStoryComponent(Primary({ label: 'Hello world' }, {} as any));
- *     await render(component, { imports: [ ngModule ] });
- *     expect(screen.getByText(/Hello world/i)).not.toBeNull();
- *   });
- * })
+ * test('renders primary button with Hello World', () => {
+ *   const { getByText } = render(<Primary>Hello world</Primary>);
+ *   expect(getByText(/Hello world/i)).not.toBeNull();
+ * });
  *```
  *
  * @param story
- * @param meta - e.g. (import Meta from './Button.stories')
- * @param [globalConfig] - e.g. (import * as globalConfig from '../.storybook/preview') this can be applied automatically if you use `setGlobalConfig` in your setup files.
+ * @param componentAnnotations - e.g. (import Meta from './Button.stories')
+ * @param [projectAnnotations] - e.g. (import * as projectAnnotations from '../.storybook/preview') this can be applied automatically if you use `setProjectAnnotations` in your setup files.
+ * @param [exportsName] - in case your story does not contain a name and you want it to have a name.
  */
-export function composeStory<GenericArgs>(
-  story: Story<GenericArgs>,
-  meta: Meta,
-  globalConfig: GlobalConfig = globalStorybookConfig
+export function composeStory<TArgs extends Args = Args>(
+  story: ComposedStory<AngularRenderer, TArgs>,
+  // componentAnnotations: Meta<TArgs | any>,
+  componentAnnotations: Meta<TArgs>,
+  projectAnnotations?: ProjectAnnotations<AngularRenderer>,
+  exportsName?: string
 ) {
-  if (isInvalidStory(story)) {
-    throw new Error(
-      `Cannot compose story due to invalid format. @storybook/testing-angular expected a function but received ${typeof story} instead.`
-    );
-  }
-
-  if ((story as any).story !== undefined) {
-    throw new Error(
-      `StoryFn.story object-style annotation is not supported. @storybook/testing-angular expects hoisted CSF stories.
-       https://github.com/storybookjs/storybook/blob/next/MIGRATION.md#hoisted-csf-annotations`
-    );
-  }
-
-  const finalStoryFn = (context: StoryContext) => {
-    const { passArgsFirst = true } = context.parameters;
-    if (!passArgsFirst) {
-      throw new Error(
-        'composeStory does not support legacy style stories (with passArgsFirst = false).'
-      );
-    }
-
-    const returnType = story(
-      context.args as GenericArgs,
-      context,
-    ) as StoryFnAngularReturnType;
-
-    if (!returnType.component && meta?.component) {
-      returnType.component = meta?.component;
-    }
-
-    return returnType;
-  }
-
-  const combinedDecorators = [
-    ...(story.decorators || []),
-    ...(meta?.decorators || []),
-    ...(globalConfig?.decorators || []),
-  ];
-
-  const decorated = defaultDecorateStory(
-    finalStoryFn as any,
-    combinedDecorators as any,
+  return originalComposeStory<AngularRenderer, TArgs>(
+    story as ComposedStory<AngularRenderer, Args>,
+    componentAnnotations,
+    projectAnnotations,
+    defaultProjectAnnotations,
+    exportsName
   );
-
-  const defaultGlobals = Object.entries(
-    (globalConfig.globalTypes || {}) as Record<string, { defaultValue: any }>
-  ).reduce((acc, [arg, { defaultValue }]) => {
-    if (defaultValue) {
-      acc[arg] = defaultValue;
-    }
-    return acc;
-  }, {} as Record<string, { defaultValue: any }>);
-
-  const combinedParameters = combineParameters(
-    globalConfig.parameters || {},
-    meta.parameters || {},
-    story.parameters || {},
-  );
-
-  const combinedArgs = {
-    ...meta.args,
-    ...story.args,
-  };
-
-  const composedStory = (extraArgs: Record<string, any>) => {
-    const config = {
-      id: '',
-      kind: '',
-      name: '',
-      argTypes: globalConfig.argTypes || {},
-      globals: defaultGlobals,
-      parameters: combinedParameters,
-      args: {
-        ...combinedArgs,
-        ...extraArgs,
-      },
-    };
-
-    return decorated(config);
-  };
-
-  composedStory.args = combinedArgs;
-  composedStory.decorators = combinedDecorators;
-  composedStory.parameters = combinedParameters;
-
-  return composedStory as Story<Partial<GenericArgs>>;
 }
 
 /**
  * Function that will receive a stories import (e.g. `import * as stories from './Button.stories'`)
- * and optionally a globalConfig (e.g. `import * from '../.storybook/preview`)
+ * and optionally projectAnnotations (e.g. `import * from '../.storybook/preview`)
  * and will return an object containing all the stories passed, but now as a composed component that has all args/parameters/decorators/etc combined and applied to it.
  *
  *
  * It's very useful for reusing stories in scenarios outside of Storybook like unit testing.
  *
  * Example:
- *```ts
- * import { render, screen } from '@testing-library/angular';
- * import { composeStory } from '@storybook/testing-angular';
+ *```jsx
+ * import { render } from '@testing-library/react';
+ * import { composeStories } from '@storybook/react';
  * import * as stories from './Button.stories';
  *
  * const { Primary, Secondary } = composeStories(stories);
  *
- * describe('button', () => {
- *   it('renders primary button with Hello World', () => {
- *     const { component, ngModule } = createMountableStoryComponent(Primary({ label: 'Hello world' }, {} as any));
- *     await render(component, { imports: [ ngModule ] });
- *     expect(screen.getByText(/Hello world/i)).not.toBeNull();
- *   });
- * })
+ * test('renders primary button with Hello World', () => {
+ *   const { getByText } = render(<Primary>Hello world</Primary>);
+ *   expect(getByText(/Hello world/i)).not.toBeNull();
+ * });
  *```
  *
- * @param storiesImport - e.g. (import * as stories from './Button.stories')
- * @param [globalConfig] - e.g. (import * as globalConfig from '../.storybook/preview') this can be applied automatically if you use `setGlobalConfig` in your setup files.
+ * @param csfExports - e.g. (import * as stories from './Button.stories')
+ * @param [projectAnnotations] - e.g. (import * as projectAnnotations from '../.storybook/preview') this can be applied automatically if you use `setProjectAnnotations` in your setup files.
  */
-export function composeStories<
-  T extends { default: Meta, __esModule?: boolean }
->(storiesImport: T, globalConfig?: GlobalConfig) {
-  const { default: meta, __esModule, ...stories } = storiesImport;
+export function composeStories<TArgs extends Args, TModule extends Store_CSFExports<AngularRenderer, TArgs> = Store_CSFExports<AngularRenderer, TArgs>>(
+  csfExports: TModule,
+  projectAnnotations?: ProjectAnnotations<AngularRenderer>
+) {
+  // @ts-expect-error (Converted from ts-ignore)
+  const composedStories = originalComposeStories(csfExports, projectAnnotations, composeStory);
 
-  // Compose an object containing all processed stories passed as parameters
-  const composedStories = Object.entries(stories).reduce(
-    (storiesMap, [key, story]) => {
-      storiesMap[key] = composeStory(story as Story, meta, globalConfig)
-      return storiesMap
-    },
-    {} as { [key: string]: Story },
-  );
-
-  return composedStories as StoriesWithPartialProps<T>;
+  return composedStories as unknown as Omit<
+    StoriesWithPartialProps<AngularRenderer, TModule>,
+    keyof Store_CSFExports
+  >;
 }
+
 
 interface StoryRenderInfo {
   storyFnAngular: StoryFnAngularReturnType;
@@ -210,7 +152,7 @@ interface StoryRenderInfo {
 
 export interface RenderableStoryAndModule {
   component: any;
-  ngModule: Type<any>;
+  applicationConfig: ApplicationConfig;
 }
 
 export class SbTestingRenderer {
@@ -222,47 +164,34 @@ export class SbTestingRenderer {
 
   protected isFirstRender: boolean = true;
 
-  constructor(public storyId: string) {}
+  constructor(public storyId: string) { }
 
   public getRenderableComponent({
     storyFnAngular,
     forced,
-    parameters
+    // parameters
+    component,
+    targetDOMNode,
   }: {
     storyFnAngular: StoryFnAngularReturnType;
     forced: boolean;
-    parameters: Parameters;
-  }): Type<any> | null {
-    const targetSelector = `${this.storyId}`;
+    // parameters: Parameters;
+    component?: any;
+    targetDOMNode: HTMLElement;
+  }): {
+    component: Type<any> | null;
+    applicationConfig: ApplicationConfig;
+  } | null {
+    const targetSelector = this.generateTargetSelectorFromStoryId(targetDOMNode.id);
 
     const newStoryProps$ = new BehaviorSubject<ICollection | undefined>(storyFnAngular.props ?? {});
-    const _moduleMetadata = getStorybookModuleMetadata(
-      { storyFnAngular, parameters, targetSelector },
-      newStoryProps$,
-    );
-
-    const moduleMetadata = {
-      declarations: [
-        ...(_moduleMetadata.declarations ?? []),
-      ],
-      imports: [
-        ...(_moduleMetadata.imports ?? []),
-      ],
-      providers: [
-        ...(_moduleMetadata.providers ?? []),
-      ],
-      entryComponents: [
-        ...(_moduleMetadata.entryComponents ?? []),
-      ],
-      schemas: [
-        ...(_moduleMetadata.schemas ?? []),
-      ],
-    };
 
     if (
       !this.fullRendererRequired({
         storyFnAngular,
-        moduleMetadata,
+        moduleMetadata: {
+          ...storyFnAngular.moduleMetadata,
+        },
         forced,
       })
     ) {
@@ -277,7 +206,24 @@ export class SbTestingRenderer {
 
     this.storyProps$ = newStoryProps$;
 
-    return createStorybookModule(moduleMetadata);
+    const analyzedMetadata = new PropertyExtractor(storyFnAngular.moduleMetadata || {}, component);
+
+    return {
+      component: getApplication({
+        storyFnAngular,
+        component,
+        targetSelector,
+        analyzedMetadata,
+      }),
+      applicationConfig: {
+        ...storyFnAngular.applicationConfig,
+        providers: [
+          storyPropsProvider(newStoryProps$),
+          ...(analyzedMetadata.applicationProviders ?? []),
+          ...(storyFnAngular.applicationConfig?.providers ?? []),
+        ],
+      }
+    };
   }
 
   public completeStory(): void {
@@ -328,6 +274,24 @@ export class SbTestingRenderer {
 
     return hasChangedModuleMetadata;
   }
+
+  /**
+   * Only ASCII alphanumerics can be used as HTML tag name.
+   * https://html.spec.whatwg.org/#elements-2
+   *
+   * Therefore, stories break when non-ASCII alphanumerics are included in target selector.
+   * https://github.com/storybookjs/storybook/issues/15147
+   *
+   * This method returns storyId when it doesn't contain any non-ASCII alphanumerics.
+   * Otherwise, it generates a valid HTML tag name from storyId by removing non-ASCII alphanumerics from storyId, prefixing "sb-", and suffixing "-component"
+   * @protected
+   * @memberof AbstractRenderer
+   */
+  protected generateTargetSelectorFromStoryId(id: string) {
+    const invalidHtmlTag = /[^A-Za-z0-9-]/g;
+    const storyIdIsInvalidHtmlTagName = invalidHtmlTag.test(id);
+    return storyIdIsInvalidHtmlTagName ? `sb-${id.replace(invalidHtmlTag, '')}-component` : id;
+  }
 }
 
 /**
@@ -336,38 +300,18 @@ export class SbTestingRenderer {
  * @param story 
  * @returns 
  */
-export function createMountableStoryComponent(storyFnReturn: StoryFnAngularReturnType): RenderableStoryAndModule {
+export function createMountableStoryComponent(storyFnReturn: StoryFnAngularReturnType, component: any): RenderableStoryAndModule {
   const storyId = `storybook-testing-wrapper`;
   const renderer = new SbTestingRenderer(storyId);
 
-  // This additional wrapper can probably be avoided by making some changes to
-  // the renderer or wrapper component in '@storybook/angular'.
-  @Component({
-    selector: 'sb-testing-mountable',
-    template: `<${storyId}></${storyId}>`,
-  })
-  class SbTestingMountable implements OnDestroy, AfterViewInit {
-
-    ngOnDestroy(): void {
-      renderer.completeStory();
-    }
-
-    ngAfterViewInit(): void {
-      renderer.getRenderableComponent({
-        storyFnAngular: storyFnReturn as any,
-        forced: false,
-        parameters: {} as any,
-      });
-    }
-
-  }
+  const domNode = document.createElement('span')
+  domNode.id = storyId
 
   const _story: any = {
     ...(storyFnReturn as any),
     moduleMetadata: {
       declarations: [
         ...((storyFnReturn as any).moduleMetadata?.declarations ?? []),
-        SbTestingMountable,
       ],
       imports: [
         ...((storyFnReturn as any).moduleMetadata?.imports ?? []),
@@ -381,17 +325,48 @@ export function createMountableStoryComponent(storyFnReturn: StoryFnAngularRetur
       schemas: [
         ...((storyFnReturn as any).moduleMetadata?.schemas ?? []),
       ],
-      exports: [
-        SbTestingMountable,
-      ],
     }
   };
+
 
   const _module = renderer.getRenderableComponent({
     storyFnAngular: _story,
     forced: false,
-    parameters: {} as any,
+    // parameters: {} as any,
+    targetDOMNode: domNode,
+    component
   });
+
+  // This additional wrapper can probably be avoided by making some changes to
+  // the renderer or wrapper component in '@storybook/angular'.
+  @Component({
+    selector: 'sb-testing-mountable',
+    template: `<${storyId}></${storyId}>`,
+    imports: [
+      (_module as any).component
+    ],
+    providers: (_module!.applicationConfig.providers as any),
+    standalone: true
+  })
+  class SbTestingMountable implements OnDestroy, AfterViewInit {
+
+    ngOnDestroy(): void {
+      renderer.completeStory();
+    }
+
+    ngAfterViewInit(): void {
+      const domNode = document.createElement('span')
+      domNode.id = storyId
+      renderer.getRenderableComponent({
+        storyFnAngular: storyFnReturn as any,
+        forced: false,
+        // parameters: {} as any,
+        targetDOMNode: domNode,
+        component,
+      });
+    }
+
+  }
 
   if (_module === null) {
     throw Error(`Must initially have module`);
@@ -399,6 +374,6 @@ export function createMountableStoryComponent(storyFnReturn: StoryFnAngularRetur
 
   return {
     component: SbTestingMountable,
-    ngModule: _module,
+    applicationConfig: _module.applicationConfig
   };
 }
