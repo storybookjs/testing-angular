@@ -24,7 +24,6 @@ import { ICollection, StoryFnAngularReturnType } from '@storybook/angular/dist/c
 import { render } from '@storybook/angular/dist/client/render'
 import { getApplication, storyPropsProvider } from '@storybook/angular/renderer'
 import { PropertyExtractor } from '@storybook/angular/dist/client/angular-beta/utils/PropertyExtractor';
-// import type { GlobalConfig, StoriesWithPartialProps } from './types';
 
 /** Function that sets the globalConfig of your storybook. The global config is the preview module of your .storybook folder.
  *
