@@ -28,6 +28,12 @@
       "@angular/*": [
         "./node_modules/@angular/*"
       ],
+      "webpack/*": [
+        "./node_modules/webpack/*"
+      ],
+      "webpack": [
+        "./node_modules/webpack"
+      ],
       "@storybook/testing-angular": [
         "../dist"
       ]

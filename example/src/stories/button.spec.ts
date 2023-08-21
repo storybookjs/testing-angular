@@ -28,7 +28,9 @@ describe('button TestBed', () => {
     const componentAndConfig = createMountableStoryComponent(Primary({}, {} as any), Meta.component);
     component = componentAndConfig.component;
     applicationConfig = componentAndConfig.applicationConfig;
-    await TestBed.configureTestingModule({}).compileComponents();
+    await TestBed.configureTestingModule({
+      providers: applicationConfig.providers,
+    }).compileComponents();
   });
 
   it('should create the app', () => {
@@ -48,22 +50,22 @@ describe('button TestBed', () => {
 
 describe('button testing-library', () => {
   it('renders primary button', async () => {
-    const { component } = createMountableStoryComponent(Primary({}, {} as any), Meta.component);
-    await render(component);
+    const { component, applicationConfig } = createMountableStoryComponent(Primary({}, {} as any), Meta.component);
+    await render(component, { providers: applicationConfig.providers });
     expect(screen.getByText(Primary.args?.label!)).not.toBeNull();
   });
 
   it('renders other button', async () => {
     console.log('Other', Other)
-    const { component } = createMountableStoryComponent(Other({}, {} as any), Meta.component);
-    await render(component);
+    const { component, applicationConfig } = createMountableStoryComponent(Other({}, {} as any), Meta.component);
+    await render(component, { providers: applicationConfig.providers });
     expect(screen.getByText(Other.args?.label!)).not.toBeNull();
   });
 
   it('renders primary button with spy', async () => {
     const onClickSpy = jasmine.createSpy()
-    const { component } = createMountableStoryComponent(Primary({ onClick: onClickSpy as any }, {} as any), Meta.component);
-    await render(component);
+    const { component, applicationConfig } = createMountableStoryComponent(Primary({ onClick: onClickSpy as any }, {} as any), Meta.component);
+    await render(component, { providers: applicationConfig.providers });
     const buttonElement = screen.getByText(Primary.args?.label!);
     buttonElement.click();
     expect(onClickSpy as any).toHaveBeenCalled();

@@ -344,7 +344,6 @@ export function createMountableStoryComponent(storyFnReturn: StoryFnAngularRetur
     imports: [
       (_module as any).component
     ],
-    providers: (_module!.applicationConfig.providers as any),
     standalone: true
   })
   class SbTestingMountable implements OnDestroy, AfterViewInit {

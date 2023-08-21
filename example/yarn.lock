@@ -2741,6 +2741,13 @@
     pump "^3.0.0"
     tar-fs "^2.1.1"
 
+"@ngrx/store@^16.2.0":
+  version "16.2.0"
+  resolved "https://registry.yarnpkg.com/@ngrx/store/-/store-16.2.0.tgz#2e3a336740e472b751f3f0765e09a429019c3523"
+  integrity sha512-C7oIUC87xXV+1dTGUwYG/L4p0IZdYv/Ou1nTL/LffyAHllmmygTA5gzLB87abLOhucAxlFIQMQ8t/GSxdk/+QA==
+  dependencies:
+    tslib "^2.0.0"
+
 "@ngtools/webpack@16.0.5":
   version "16.0.5"
   resolved "https://registry.yarnpkg.com/@ngtools/webpack/-/webpack-16.0.5.tgz#4a2f4e5b02984e69fbfdabd8a5c7da14191734b3"
@@ -10964,6 +10971,11 @@ tslib@^1.13.0:
   version "1.14.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.14.1.tgz#cf2d38bdc34a134bcaf1091c41f6619e2f672d00"
   integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
+
+tslib@^2.0.0:
+  version "2.6.2"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.6.2.tgz#703ac29425e7b37cd6fd456e92404d46d1f3e4ae"
+  integrity sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==
 
 tslib@^2.0.1, tslib@^2.0.3, tslib@^2.1.0, tslib@^2.3.0, tslib@^2.3.1, tslib@^2.4.0:
   version "2.5.3"

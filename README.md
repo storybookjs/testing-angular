@@ -89,11 +89,11 @@ const { Primary, Secondary } = composeStories(stories);
 
 describe('button', () => {
   it('renders primary button with default args', () => {
-    const { component } = createMountableStoryComponent(
+    const { component, applicationConfig } = createMountableStoryComponent(
       Primary({}, {} as any),
       Meta.component,
     );
-    await render(component);
+    await render(component, { providers: applicationConfig.providers });
     const buttonElement = screen.getByText(
       /Text coming from args in stories file!/i
     );
@@ -101,11 +101,11 @@ describe('button', () => {
   });
 
   it('renders primary button with overriden props', () => {
-    const { component } = createMountableStoryComponent(
+    const { component, applicationConfig } = createMountableStoryComponent(
       Primary({ label: 'Hello world' }, {} as any),
       Meta.component,
     ); // you can override props and they will get merged with values from the Story's args
-    await render(component);
+    await render(component, { providers: applicationConfig.providers });
     const buttonElement = screen.getByText(/Hello world/i);
     expect(buttonElement).not.toBeNull();
   });
@@ -130,11 +130,11 @@ const Primary = composeStory(PrimaryStory, Meta);
 describe('button', () => {
   it('onclick handler is called', async () => {
     const onClickSpy = jasmine.createSpy();
-    const { component } = createMountableStoryComponent(
+    const { component, applicationConfig } = createMountableStoryComponent(
       Primary({ onClick: onClickSpy }, {} as any),
       Meta.component,
     );
-    await render(component);
+    await render(component, { provider: applicationConfig.provider });
     const buttonElement = screen.getByText(Primary.args?.label!);
     buttonElement.click();
     expect(onClickSpy).toHaveBeenCalled();
@@ -159,11 +159,11 @@ const { Primary } = composeStories(stories);
 
 describe('button', () => {
   it('reuses args from composed story', async () => {
-    const { component } = createMountableStoryComponent(
+    const { component, applicationConfig } = createMountableStoryComponent(
       Primary({}, {} as any),
       Meta.component
     );
-    await render(component);
+    await render(component, { providers: applicationConfig.providers });
     expect(screen.getByText(Primary.args?.label!)).not.toBeNull();
   });
 });
