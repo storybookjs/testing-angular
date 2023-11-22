@@ -1,4 +1,4 @@
-import { composeStories, composeStory, createMountableStoryComponent } from '@storybook/testing-angular';
+import { composeStories, composeStory, createMountable } from '@storybook/testing-angular';
 
 import { render, screen } from '@testing-library/angular';
 
@@ -9,7 +9,7 @@ const composed: any = composeStories<MyCounterComponent>(stories);
 
 describe('interactive stories test', () =>
   it('should render and validate story', async () => {
-    const { component, applicationConfig } = createMountableStoryComponent(composed.Primary({}, {} as any));
+    const { component, applicationConfig } = createMountable(composed.Primary({}, {} as any));
     await render(component, { providers: applicationConfig.providers });
     expect(screen.getByText("Current Count: 0")).not.toBeNull();
   }));

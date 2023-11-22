@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/angular';
-import { composeStories, composeStory, createMountableStoryComponent } from '@storybook/testing-angular';
+import { composeStories, composeStory, createMountable } from '@storybook/testing-angular';
 
 import { ButtonComponent } from './button.component';
 // import * as stories from './Button.stories'; // import all stories from the stories file
@@ -25,7 +25,7 @@ describe('button TestBed', () => {
   let applicationConfig: ApplicationConfig
 
   beforeEach(async () => {
-    const componentAndConfig = createMountableStoryComponent(Primary({}, {} as any));
+    const componentAndConfig = createMountable(Primary({}, {} as any));
     component = componentAndConfig.component;
     applicationConfig = componentAndConfig.applicationConfig;
     await TestBed.configureTestingModule({
@@ -50,21 +50,20 @@ describe('button TestBed', () => {
 
 describe('button testing-library', () => {
   it('renders primary button', async () => {
-    const { component, applicationConfig } = createMountableStoryComponent(Primary({}, {} as any));
+    const { component, applicationConfig } = createMountable(Primary({}, {} as any));
     await render(component, { providers: applicationConfig.providers });
     expect(screen.getByText(Primary.args?.label!)).not.toBeNull();
   });
 
   it('renders other button', async () => {
-    console.log('Other', Other)
-    const { component, applicationConfig } = createMountableStoryComponent(Other({}, {} as any));
+    const { component, applicationConfig } = createMountable(Other({}, {} as any));
     await render(component, { providers: applicationConfig.providers });
     expect(screen.getByText(Other.args?.label!)).not.toBeNull();
   });
 
   it('renders primary button with spy', async () => {
     const onClickSpy = jasmine.createSpy()
-    const { component, applicationConfig } = createMountableStoryComponent(Primary({ onClick: onClickSpy as any }, {} as any));
+    const { component, applicationConfig } = createMountable(Primary({ onClick: onClickSpy as any }, {} as any));
     await render(component, { providers: applicationConfig.providers });
     const buttonElement = screen.getByText(Primary.args?.label!);
     buttonElement.click();
