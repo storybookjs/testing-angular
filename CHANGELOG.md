@@ -1,3 +1,17 @@
+# v1.0.2 (Wed Nov 22 2023)
+
+#### ⚠️ Pushed to `main`
+
+- Merge branch 'next' into main ([@Marklb](https://github.com/Marklb))
+- Change example tests to createMountable ([@Marklb](https://github.com/Marklb))
+- Add `createMountable` and workaround for redundant component passing ([@Marklb](https://github.com/Marklb))
+
+#### Authors: 1
+
+- Mark Berry ([@Marklb](https://github.com/Marklb))
+
+---
+
 # v0.0.13 (Wed Nov 22 2023)
 
 #### 🐛 Bug Fix
