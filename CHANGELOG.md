@@ -1,3 +1,24 @@
+# v0.0.13 (Wed Nov 22 2023)
+
+#### 🐛 Bug Fix
+
+- Use manual GH token [#4](https://github.com/storybookjs/testing-angular/pull/4) ([@shilman](https://github.com/shilman))
+- Upgrade release workflow to node@16 [#3](https://github.com/storybookjs/testing-angular/pull/3) ([@shilman](https://github.com/shilman))
+
+#### ⚠️ Pushed to `main`
+
+- Return `applicationConfig`, instead of adding providers to root component ([@Marklb](https://github.com/Marklb))
+- Merge remote-tracking branch 'origin/next' into next ([@Marklb](https://github.com/Marklb))
+- Remove unused files ([@Marklb](https://github.com/Marklb))
+- Refactor for Storybook v7 ([@Marklb](https://github.com/Marklb))
+
+#### Authors: 2
+
+- Mark Berry ([@Marklb](https://github.com/Marklb))
+- Michael Shilman ([@shilman](https://github.com/shilman))
+
+---
+
 # v0.0.12 (Thu Nov 25 2021)
 
 #### ⚠️ Pushed to `main`
