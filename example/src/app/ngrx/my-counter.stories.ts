@@ -10,7 +10,9 @@ export default {
   component: MyCounterComponent,
   decorators: [
     applicationConfig({
-      providers: [provideStore({ count: counterReducer })],
+      providers: [
+        provideStore({ count: counterReducer })
+      ],
     }),
   ],
 } as Meta<MyCounterComponent>;

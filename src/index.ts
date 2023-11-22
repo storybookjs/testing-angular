@@ -96,6 +96,16 @@ export function composeStory<TArgs extends Args = Args>(
   projectAnnotations?: ProjectAnnotations<AngularRenderer>,
   exportsName?: string
 ) {
+  componentAnnotations.decorators = [
+    ...(componentAnnotations.decorators ?? []),
+    (story: any, context: any) => {
+      return {
+        ...story(context.args),
+        // Storybook now retrieves the component from the context, so this is a workaround to preserve the component in composed stories.
+        _composedComponent: context.component,
+      };
+    }
+  ];
   return originalComposeStory<AngularRenderer, TArgs>(
     story as ComposedStory<AngularRenderer, Args>,
     componentAnnotations,
@@ -185,6 +195,9 @@ export class SbTestingRenderer {
 
     const newStoryProps$ = new BehaviorSubject<ICollection | undefined>(storyFnAngular.props ?? {});
 
+    // Storybook now retrieves the component from the context, so this is a workaround to preserve the component in composed stories.
+    const storyComponent = component || (storyFnAngular as any)._composedComponent;
+
     if (
       !this.fullRendererRequired({
         storyFnAngular,
@@ -205,12 +218,12 @@ export class SbTestingRenderer {
 
     this.storyProps$ = newStoryProps$;
 
-    const analyzedMetadata = new PropertyExtractor(storyFnAngular.moduleMetadata || {}, component);
+    const analyzedMetadata = new PropertyExtractor(storyFnAngular.moduleMetadata || {}, storyComponent);
 
     return {
       component: getApplication({
         storyFnAngular,
-        component,
+        component: storyComponent,
         targetSelector,
         analyzedMetadata,
       }),
@@ -299,7 +312,7 @@ export class SbTestingRenderer {
  * @param story 
  * @returns 
  */
-export function createMountableStoryComponent(storyFnReturn: StoryFnAngularReturnType, component: any): RenderableStoryAndModule {
+export function createMountableStoryComponent(storyFnReturn: StoryFnAngularReturnType, component?: any): RenderableStoryAndModule {
   const storyId = `storybook-testing-wrapper`;
   const renderer = new SbTestingRenderer(storyId);
 
@@ -374,4 +387,11 @@ export function createMountableStoryComponent(storyFnReturn: StoryFnAngularRetur
     component: SbTestingMountable,
     applicationConfig: _module.applicationConfig
   };
+}
+
+/**
+ * Function that will receive a StoryFnAngularReturnType and will return a Component and NgModule that renders the story.
+ */
+export function createMountable(storyFnReturn: StoryFnAngularReturnType): RenderableStoryAndModule {
+  return createMountableStoryComponent(storyFnReturn);
 }

@@ -25,7 +25,7 @@ describe('button TestBed', () => {
   let applicationConfig: ApplicationConfig
 
   beforeEach(async () => {
-    const componentAndConfig = createMountableStoryComponent(Primary({}, {} as any), Meta.component);
+    const componentAndConfig = createMountableStoryComponent(Primary({}, {} as any));
     component = componentAndConfig.component;
     applicationConfig = componentAndConfig.applicationConfig;
     await TestBed.configureTestingModule({
@@ -50,21 +50,21 @@ describe('button TestBed', () => {
 
 describe('button testing-library', () => {
   it('renders primary button', async () => {
-    const { component, applicationConfig } = createMountableStoryComponent(Primary({}, {} as any), Meta.component);
+    const { component, applicationConfig } = createMountableStoryComponent(Primary({}, {} as any));
     await render(component, { providers: applicationConfig.providers });
     expect(screen.getByText(Primary.args?.label!)).not.toBeNull();
   });
 
   it('renders other button', async () => {
     console.log('Other', Other)
-    const { component, applicationConfig } = createMountableStoryComponent(Other({}, {} as any), Meta.component);
+    const { component, applicationConfig } = createMountableStoryComponent(Other({}, {} as any));
     await render(component, { providers: applicationConfig.providers });
     expect(screen.getByText(Other.args?.label!)).not.toBeNull();
   });
 
   it('renders primary button with spy', async () => {
     const onClickSpy = jasmine.createSpy()
-    const { component, applicationConfig } = createMountableStoryComponent(Primary({ onClick: onClickSpy as any }, {} as any), Meta.component);
+    const { component, applicationConfig } = createMountableStoryComponent(Primary({ onClick: onClickSpy as any }, {} as any));
     await render(component, { providers: applicationConfig.providers });
     const buttonElement = screen.getByText(Primary.args?.label!);
     buttonElement.click();

@@ -79,7 +79,7 @@ If you use the composed story (e.g. PrimaryButton), the component will render wi
 import { render, screen } from '@testing-library/angular';
 import {
   composeStories,
-  createMountableStoryComponent,
+  createMountable,
 } from '@storybook/testing-angular';
 import * as stories from './button.stories'; // import all stories from the stories file
 import Meta from './button.stories';
@@ -89,9 +89,8 @@ const { Primary, Secondary } = composeStories(stories);
 
 describe('button', () => {
   it('renders primary button with default args', () => {
-    const { component, applicationConfig } = createMountableStoryComponent(
-      Primary({}, {} as any),
-      Meta.component,
+    const { component, applicationConfig } = createMountable(
+      Primary({}, {} as any)
     );
     await render(component, { providers: applicationConfig.providers });
     const buttonElement = screen.getByText(
@@ -101,9 +100,8 @@ describe('button', () => {
   });
 
   it('renders primary button with overriden props', () => {
-    const { component, applicationConfig } = createMountableStoryComponent(
-      Primary({ label: 'Hello world' }, {} as any),
-      Meta.component,
+    const { component, applicationConfig } = createMountable(
+      Primary({ label: 'Hello world' }, {} as any)
     ); // you can override props and they will get merged with values from the Story's args
     await render(component, { providers: applicationConfig.providers });
     const buttonElement = screen.getByText(/Hello world/i);
@@ -120,7 +118,7 @@ You can use `composeStory` if you wish to apply it for a single story rather tha
 import { render, screen } from '@testing-library/angular';
 import {
   composeStory,
-  createMountableStoryComponent,
+  createMountable,
 } from '@storybook/testing-angular';
 import Meta, { Primary as PrimaryStory } from './button.stories';
 
@@ -130,9 +128,8 @@ const Primary = composeStory(PrimaryStory, Meta);
 describe('button', () => {
   it('onclick handler is called', async () => {
     const onClickSpy = jasmine.createSpy();
-    const { component, applicationConfig } = createMountableStoryComponent(
-      Primary({ onClick: onClickSpy }, {} as any),
-      Meta.component,
+    const { component, applicationConfig } = createMountable(
+      Primary({ onClick: onClickSpy }, {} as any)
     );
     await render(component, { provider: applicationConfig.provider });
     const buttonElement = screen.getByText(Primary.args?.label!);
@@ -150,7 +147,7 @@ The components returned by `composeStories` or `composeStory` not only can be re
 import { render, screen } from '@testing-library/angular';
 import {
   composeStory,
-  createMountableStoryComponent,
+  createMountable,
 } from '@storybook/testing-angular';
 import * as stories from './button.stories';
 import Meta from './button.stories';
@@ -159,10 +156,7 @@ const { Primary } = composeStories(stories);
 
 describe('button', () => {
   it('reuses args from composed story', async () => {
-    const { component, applicationConfig } = createMountableStoryComponent(
-      Primary({}, {} as any),
-      Meta.component
-    );
+    const { component, applicationConfig } = createMountable(Primary({}, {} as any));
     await render(component, { providers: applicationConfig.providers });
     expect(screen.getByText(Primary.args?.label!)).not.toBeNull();
   });
