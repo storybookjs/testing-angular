@@ -10,14 +10,14 @@ import { TestBed } from '@angular/core/testing';
 import { ApplicationConfig } from '@angular/core';
 
 // Every component that is returned maps 1:1 with the stories, but they already contain all decorators from story level, meta level and global level.
-// const { Primary } = composeStories<ButtonComponent>(stories);
-// const composed: any = composeStories<ButtonComponent>(stories);
+// const { Primary } = composeStories(stories);
+// const composed: any = composeStories(stories);
 // const Primary: any = composed.Primary;
 
-const Primary = composeStory<ButtonComponent>(_Primary, Meta)
-const Other = composeStory<ButtonComponent>(_Other, Meta)
-// const Primary = composeStory<ButtonComponent>(stories.Primary, Meta)
-// const Other = composeStory<ButtonComponent>(stories.Other, Meta)
+const Primary = composeStory(_Primary, Meta)
+const Other = composeStory(_Other, Meta)
+// const Primary = composeStory(stories.Primary, Meta)
+// const Other = composeStory(stories.Other, Meta)
 
 
 describe('button TestBed', () => {
@@ -25,7 +25,7 @@ describe('button TestBed', () => {
   let applicationConfig: ApplicationConfig
 
   beforeEach(async () => {
-    const componentAndConfig = createMountable(Primary({}, {} as any));
+    const componentAndConfig = createMountable(Primary({}));
     component = componentAndConfig.component;
     applicationConfig = componentAndConfig.applicationConfig;
     await TestBed.configureTestingModule({
@@ -50,20 +50,20 @@ describe('button TestBed', () => {
 
 describe('button testing-library', () => {
   it('renders primary button', async () => {
-    const { component, applicationConfig } = createMountable(Primary({}, {} as any));
+    const { component, applicationConfig } = createMountable(Primary({}));
     await render(component, { providers: applicationConfig.providers });
     expect(screen.getByText(Primary.args?.label!)).not.toBeNull();
   });
 
   it('renders other button', async () => {
-    const { component, applicationConfig } = createMountable(Other({}, {} as any));
+    const { component, applicationConfig } = createMountable(Other({}));
     await render(component, { providers: applicationConfig.providers });
     expect(screen.getByText(Other.args?.label!)).not.toBeNull();
   });
 
   it('renders primary button with spy', async () => {
     const onClickSpy = jasmine.createSpy()
-    const { component, applicationConfig } = createMountable(Primary({ onClick: onClickSpy as any }, {} as any));
+    const { component, applicationConfig } = createMountable(Primary({ onClick: onClickSpy as any }));
     await render(component, { providers: applicationConfig.providers });
     const buttonElement = screen.getByText(Primary.args?.label!);
     buttonElement.click();

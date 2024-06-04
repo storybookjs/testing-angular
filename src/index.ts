@@ -11,10 +11,11 @@ import {
 } from '@storybook/preview-api';
 import type {
   Args,
-  ProjectAnnotations,
-  ComposedStory,
+  NamedOrDefaultProjectAnnotations,
+  StoryAnnotationsOrFn,
   Store_CSFExports,
   StoriesWithPartialProps,
+  ProjectAnnotations,
 } from '@storybook/types';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { stringify } from 'telejson';
@@ -41,20 +42,11 @@ import { PropertyExtractor } from '@storybook/angular/dist/client/angular-beta/u
  * @param projectAnnotations - e.g. (import * as projectAnnotations from '../.storybook/preview')
  */
 export function setProjectAnnotations(
-  projectAnnotations: ProjectAnnotations<AngularRenderer> | ProjectAnnotations<AngularRenderer>[]
+  projectAnnotations:
+    | NamedOrDefaultProjectAnnotations<AngularRenderer>
+    | NamedOrDefaultProjectAnnotations<AngularRenderer>[]
 ) {
   originalSetProjectAnnotations<AngularRenderer>(projectAnnotations);
-}
-
-/** Preserved for users migrating from `@storybook/testing-react`.
- *
- * @deprecated Use setProjectAnnotations instead
- */
-export function setGlobalConfig(
-  projectAnnotations: ProjectAnnotations<AngularRenderer> | ProjectAnnotations<AngularRenderer>[]
-) {
-  // deprecate(`setGlobalConfig is deprecated. Use setProjectAnnotations instead.`);
-  setProjectAnnotations(projectAnnotations);
 }
 
 // This will not be necessary once we have auto preset loading
@@ -90,14 +82,13 @@ const defaultProjectAnnotations: ProjectAnnotations<AngularRenderer> = {
  * @param [exportsName] - in case your story does not contain a name and you want it to have a name.
  */
 export function composeStory<TArgs extends Args = Args>(
-  story: ComposedStory<AngularRenderer, TArgs>,
-  // componentAnnotations: Meta<TArgs | any>,
-  componentAnnotations: Meta<TArgs>,
+  story: StoryAnnotationsOrFn<AngularRenderer, TArgs>,
+  componentAnnotations: Meta<TArgs | any>,
   projectAnnotations?: ProjectAnnotations<AngularRenderer>,
   exportsName?: string
 ) {
   componentAnnotations.decorators = [
-    ...(componentAnnotations.decorators ?? []),
+    ...(componentAnnotations.decorators ?? ([] as any)),
     (story: any, context: any) => {
       return {
         ...story(context.args),
@@ -107,8 +98,9 @@ export function composeStory<TArgs extends Args = Args>(
     }
   ];
   return originalComposeStory<AngularRenderer, TArgs>(
-    story as ComposedStory<AngularRenderer, Args>,
-    componentAnnotations,
+    story as StoryAnnotationsOrFn<AngularRenderer, Args>,
+    // TODO: Fix types
+    componentAnnotations as any,
     projectAnnotations,
     defaultProjectAnnotations,
     exportsName

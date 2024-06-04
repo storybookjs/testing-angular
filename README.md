@@ -61,10 +61,10 @@ If you have global decorators/parameters/etc and want them applied to your stori
 
 ```ts
 // test.ts <-- this will run before the tests in karma.
-import { setGlobalConfig } from '@storybook/testing-angular';
+import { setProjectAnnotations } from '@storybook/testing-angular';
 import * as globalStorybookConfig from '../.storybook/preview'; // path of your preview.js file
 
-setGlobalConfig(globalStorybookConfig);
+setProjectAnnotations(globalStorybookConfig);
 ```
 
 ## Usage

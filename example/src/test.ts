@@ -8,9 +8,9 @@ import {
 } from '@angular/platform-browser-dynamic/testing';
 
 import * as globalStorybookConfig from '../.storybook/preview'; // path of your preview.js file
-import { setGlobalConfig } from '@storybook/testing-angular';
+import { setProjectAnnotations } from '@storybook/testing-angular';
 
-setGlobalConfig(globalStorybookConfig);
+setProjectAnnotations(globalStorybookConfig);
 
 declare const require: {
   context(path: string, deep?: boolean, filter?: RegExp): {
@@ -23,7 +23,7 @@ declare const require: {
 getTestBed().initTestEnvironment(
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting(),
-  { teardown: { destroyAfterEach: true }},
+  { teardown: { destroyAfterEach: true } },
 );
 
 // Then we find all the tests.
