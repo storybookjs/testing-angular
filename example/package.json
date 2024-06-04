@@ -24,7 +24,7 @@
     "@testing-library/angular": "^14.1.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
-    "zone.js": "~0.13.0"
+    "zone.js": "~0.14.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^16.0.2",
@@ -47,6 +47,6 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "storybook": "^7.3.2",
-    "typescript": "~5.0.2"
+    "typescript": "~5.2.0"
   }
 }
