@@ -3,13 +3,26 @@ import { composeStories, composeStory, createMountable } from '@storybook/testin
 import { render, screen } from '@testing-library/angular';
 
 import * as stories from './my-counter.stories';
-import { MyCounterComponent } from './my-counter.component';
+import meta, { Primary } from './my-counter.stories';
 
-const composed: any = composeStories<MyCounterComponent>(stories);
+const composed = composeStories(stories);
 
-describe('interactive stories test', () =>
-  it('should render and validate story', async () => {
-    const { component, applicationConfig } = createMountable(composed.Primary({}, {} as any));
-    await render(component, { providers: applicationConfig.providers });
-    expect(screen.getByText("Current Count: 0")).not.toBeNull();
-  }));
+const _Primary = composeStory(Primary, meta);
+
+describe('interactive stories test', () => {
+  describe('composeStories', () => {
+    it('should render and validate story', async () => {
+      const { component, applicationConfig } = createMountable(composed.Primary({}));
+      await render(component, { providers: applicationConfig.providers });
+      expect(screen.getByText("Current Count: 0")).not.toBeNull();
+    });
+  });
+
+  describe('composeStory', () => {
+    it('should render and validate story', async () => {
+      const { component, applicationConfig } = createMountable(_Primary({}));
+      await render(component, { providers: applicationConfig.providers });
+      expect(screen.getByText("Current Count: 0")).not.toBeNull();
+    });
+  });
+});

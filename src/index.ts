@@ -1,8 +1,7 @@
 import { AfterViewInit, ApplicationConfig, Component, NgModule, OnDestroy, Type } from '@angular/core';
 import type {
   Meta,
-  // Story, StoryContext, Parameters,
-  AngularRenderer
+  AngularRenderer,
 } from '@storybook/angular';
 import {
   composeStory as originalComposeStory,
@@ -20,7 +19,6 @@ import type {
 import { BehaviorSubject, Subject } from 'rxjs';
 import { stringify } from 'telejson';
 
-// import { isInvalidStory, getStorybookModuleMetadata } from './utils';
 import { ICollection, StoryFnAngularReturnType } from '@storybook/angular/dist/client/types';
 import { render } from '@storybook/angular/dist/client/render'
 import { getApplication, storyPropsProvider } from '@storybook/angular/renderer'
@@ -31,9 +29,9 @@ import { PropertyExtractor } from '@storybook/angular/dist/client/angular-beta/u
  * It should be run a single time, so that your global config (e.g. decorators) is applied to your stories when using `composeStories` or `composeStory`.
  *
  * Example:
- *```jsx
+ *```ts
  * // setup.js (for jest)
- * import { setProjectAnnotations } from '@storybook/react';
+ * import { setProjectAnnotations } from '@storybook/angular';
  * import * as projectAnnotations from './.storybook/preview';
  *
  * setProjectAnnotations(projectAnnotations);
@@ -63,16 +61,23 @@ const defaultProjectAnnotations: ProjectAnnotations<AngularRenderer> = {
  * It's very useful for reusing a story in scenarios outside of Storybook like unit testing.
  *
  * Example:
- *```jsx
- * import { render } from '@testing-library/react';
- * import { composeStory } from '@storybook/react';
- * import Meta, { Primary as PrimaryStory } from './Button.stories';
+ *```ts
+ * import { render, screen } from '@testing-library/angular';
+ * import {
+ *   composeStories,
+ *   createMountable,
+ * } from '@storybook/testing-angular';
+ * import Meta, { Primary as PrimaryStory } from './button.stories';
  *
  * const Primary = composeStory(PrimaryStory, Meta);
  *
- * test('renders primary button with Hello World', () => {
- *   const { getByText } = render(<Primary>Hello world</Primary>);
- *   expect(getByText(/Hello world/i)).not.toBeNull();
+ * describe('renders primary button with Hello World', () => {
+ *   it('renders primary button with Hello World', async () => {
+ *     const { component, applicationConfig } = createMountable(Primary({ label: 'Hello world' }));
+ *     await render(component, { providers: applicationConfig.providers });
+ *     const buttonElement = screen.getByText(/Hello world/i);
+ *     expect(buttonElement).not.toBeNull();
+ *   });
  * });
  *```
  *
@@ -116,23 +121,30 @@ export function composeStory<TArgs extends Args = Args>(
  * It's very useful for reusing stories in scenarios outside of Storybook like unit testing.
  *
  * Example:
- *```jsx
- * import { render } from '@testing-library/react';
- * import { composeStories } from '@storybook/react';
- * import * as stories from './Button.stories';
- *
- * const { Primary, Secondary } = composeStories(stories);
- *
- * test('renders primary button with Hello World', () => {
- *   const { getByText } = render(<Primary>Hello world</Primary>);
- *   expect(getByText(/Hello world/i)).not.toBeNull();
+ *```ts
+ * import { render, screen } from '@testing-library/angular';
+ * import {
+ *   composeStory,
+ *   createMountable,
+ * } from '@storybook/testing-angular';
+ * import * as stories from './button.stories';
+ * import Meta from './button.stories';
+ * 
+ * const { Primary } = composeStories(stories);
+ * 
+ * describe('button', () => {
+ *   it('reuses args from composed story', async () => {
+ *     const { component, applicationConfig } = createMountable(Primary({}));
+ *     await render(component, { providers: applicationConfig.providers });
+ *     expect(screen.getByText(Primary.args?.label!)).not.toBeNull();
+ *   });
  * });
  *```
  *
  * @param csfExports - e.g. (import * as stories from './Button.stories')
  * @param [projectAnnotations] - e.g. (import * as projectAnnotations from '../.storybook/preview') this can be applied automatically if you use `setProjectAnnotations` in your setup files.
  */
-export function composeStories<TArgs extends Args, TModule extends Store_CSFExports<AngularRenderer, TArgs> = Store_CSFExports<AngularRenderer, TArgs>>(
+export function composeStories<TModule extends Store_CSFExports<AngularRenderer, any>>(
   csfExports: TModule,
   projectAnnotations?: ProjectAnnotations<AngularRenderer>
 ) {
