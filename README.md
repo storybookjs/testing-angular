@@ -32,11 +32,11 @@ yarn add --dev @storybook/testing-angular
 
 ## Setup
 
-### Storybook 7 and Component Story Format
+### Storybook 8 and Component Story Format
 
-This library requires you to be using Storybook version 7, [Component Story Format (CSF)](https://storybook.js.org/docs/angular/api/csf) and [hoisted CSF annotations](https://github.com/storybookjs/storybook/blob/next/MIGRATION.md#hoisted-csf-annotations), which is the recommended way to write stories since Storybook 7.
+This library requires you to be using Storybook version 8, [Component Story Format (CSF)](https://storybook.js.org/docs/angular/api/csf) and [hoisted CSF annotations](https://github.com/storybookjs/storybook/blob/next/MIGRATION.md#hoisted-csf-annotations), which is the recommended way to write stories since Storybook 8.
 
-Essentially, if you use Storybook 7 and your stories look similar to this, you're good to go!
+Essentially, if you use Storybook 8 and your stories look similar to this, you're good to go!
 
 ```ts
 // CSF: default export (meta) + named exports (stories)
