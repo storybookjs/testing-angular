@@ -1,3 +1,23 @@
+# v1.0.3 (Tue Jul 09 2024)
+
+#### ⚠️ Pushed to `main`
+
+- Merge branch 'next' ([@Marklb](https://github.com/Marklb))
+- Update SB version in Readme ([@Marklb](https://github.com/Marklb))
+- Fix composeStories types and example snippets ([@Marklb](https://github.com/Marklb))
+- Upgrade dependencies ([@Marklb](https://github.com/Marklb))
+- Update workflow node version ([@Marklb](https://github.com/Marklb))
+- Upgrade to Storybook v8 ([@Marklb](https://github.com/Marklb))
+- Upgrade example to Angular 18 ([@Marklb](https://github.com/Marklb))
+- Upgrade example to Angular 17 ([@Marklb](https://github.com/Marklb))
+- Before example upgrade ([@Marklb](https://github.com/Marklb))
+
+#### Authors: 1
+
+- Mark Berry ([@Marklb](https://github.com/Marklb))
+
+---
+
 # v1.0.2 (Wed Nov 22 2023)
 
 #### ⚠️ Pushed to `main`
