@@ -32,11 +32,11 @@ yarn add --dev @storybook/testing-angular
 
 ## Setup
 
-### Storybook 7 and Component Story Format
+### Storybook 8 and Component Story Format
 
-This library requires you to be using Storybook version 7, [Component Story Format (CSF)](https://storybook.js.org/docs/angular/api/csf) and [hoisted CSF annotations](https://github.com/storybookjs/storybook/blob/next/MIGRATION.md#hoisted-csf-annotations), which is the recommended way to write stories since Storybook 7.
+This library requires you to be using Storybook version 8, [Component Story Format (CSF)](https://storybook.js.org/docs/angular/api/csf) and [hoisted CSF annotations](https://github.com/storybookjs/storybook/blob/next/MIGRATION.md#hoisted-csf-annotations), which is the recommended way to write stories since Storybook 8.
 
-Essentially, if you use Storybook 7 and your stories look similar to this, you're good to go!
+Essentially, if you use Storybook 8 and your stories look similar to this, you're good to go!
 
 ```ts
 // CSF: default export (meta) + named exports (stories)
@@ -61,10 +61,10 @@ If you have global decorators/parameters/etc and want them applied to your stori
 
 ```ts
 // test.ts <-- this will run before the tests in karma.
-import { setGlobalConfig } from '@storybook/testing-angular';
+import { setProjectAnnotations } from '@storybook/testing-angular';
 import * as globalStorybookConfig from '../.storybook/preview'; // path of your preview.js file
 
-setGlobalConfig(globalStorybookConfig);
+setProjectAnnotations(globalStorybookConfig);
 ```
 
 ## Usage
@@ -88,9 +88,9 @@ import Meta from './button.stories';
 const { Primary, Secondary } = composeStories(stories);
 
 describe('button', () => {
-  it('renders primary button with default args', () => {
+  it('renders primary button with default args', async () => {
     const { component, applicationConfig } = createMountable(
-      Primary({}, {} as any)
+      Primary({})
     );
     await render(component, { providers: applicationConfig.providers });
     const buttonElement = screen.getByText(
@@ -99,9 +99,9 @@ describe('button', () => {
     expect(buttonElement).not.toBeNull();
   });
 
-  it('renders primary button with overriden props', () => {
+  it('renders primary button with overriden props', async () => {
     const { component, applicationConfig } = createMountable(
-      Primary({ label: 'Hello world' }, {} as any)
+      Primary({ label: 'Hello world' })
     ); // you can override props and they will get merged with values from the Story's args
     await render(component, { providers: applicationConfig.providers });
     const buttonElement = screen.getByText(/Hello world/i);
@@ -129,7 +129,7 @@ describe('button', () => {
   it('onclick handler is called', async () => {
     const onClickSpy = jasmine.createSpy();
     const { component, applicationConfig } = createMountable(
-      Primary({ onClick: onClickSpy }, {} as any)
+      Primary({ onClick: onClickSpy })
     );
     await render(component, { provider: applicationConfig.provider });
     const buttonElement = screen.getByText(Primary.args?.label!);
@@ -156,7 +156,7 @@ const { Primary } = composeStories(stories);
 
 describe('button', () => {
   it('reuses args from composed story', async () => {
-    const { component, applicationConfig } = createMountable(Primary({}, {} as any));
+    const { component, applicationConfig } = createMountable(Primary({}));
     await render(component, { providers: applicationConfig.providers });
     expect(screen.getByText(Primary.args?.label!)).not.toBeNull();
   });

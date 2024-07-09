@@ -15,18 +15,20 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/example",
+            "outputPath": {
+              "base": "dist/example"
+            },
             "index": "src/index.html",
-            "main": "src/main.ts",
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": ["src/favicon.ico", "src/assets"],
             "styles": ["src/styles.scss"],
             "scripts": [],
-            "sourceMap": true
+            "sourceMap": true,
+            "browser": "src/main.ts"
           },
           "configurations": {
             "production": {
@@ -45,9 +47,7 @@
               "outputHashing": "all"
             },
             "development": {
-              "buildOptimizer": false,
               "optimization": false,
-              "vendorChunk": true,
               "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true
@@ -59,10 +59,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "example:build:production"
+              "buildTarget": "example:build:production"
             },
             "development": {
-              "browserTarget": "example:build:development"
+              "buildTarget": "example:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -70,7 +70,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "example:build"
+            "buildTarget": "example:build"
           }
         },
         "test": {
